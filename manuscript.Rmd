@@ -1,0 +1,91 @@
+---
+title             : "Full-day, in home validation of infant body position measurements from inertial sensors"
+shorttitle        : "Infant position in the home"
+
+author: 
+  - name          : "John M. Franchak"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "UC Riverside Department of Psychology, 900 University Avenue, Riverside, CA 92521"
+    email         : "franchak@ucr.edu"
+  - name          : "Maximilian Tang"
+    affiliation   : "1"
+  - name          : "Hailey Rousey"
+    affiliation   : "1"
+  - name          : "Chuan Luo"
+    affiliation   : "1"
+      
+authornote: |
+  Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
+
+  Enter author note here.
+
+abstract: |
+  Abstract
+  
+keywords          : "body position, motor development, everyday experiences, sitting, machine learning"
+wordcount         : "X"
+
+bibliography      : "master.bib"
+
+floatsintext      : no
+linenumbers       : no
+draft             : no
+mask              : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+csl               : apa.csl
+classoption       : "man"
+output            : papaja::apa6_pdf
+header-includes:
+  - \raggedbottom
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+library("papaja")
+library(knitr)
+library(patchwork)
+library(tidyverse)
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+
+# Current 
+
+# Methods
+
+## Participants
+
+## Apparatus
+
+## Procedure
+
+## Body position annotation
+
+## Body position classification
+
+# Goal 1: Optimize and validate body position classification model
+
+# Goal 2: Assess classification accuracy across a long delay
+
+# Goal 3: Examine wear time and compliance in full-day data collection
+
+# Goal 4: Compare classification estimates to prior literature
+
+# Discussion
+
+
+\newpage
+
+# References
+
+::: {#refs custom-style="Bibliography"}
+:::
