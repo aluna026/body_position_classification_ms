@@ -14,10 +14,12 @@ training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ung
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
 
 temp_id <- 9908
+bad_ids <- c(9909, 10204, 10802)
 
-group_model <- function(temp_id, training, ntree = 50) {
+group_model <- function(temp_id, training, ntree = 50, bad_ids = NULL) {
+  print(temp_id)
   temp_group_training <- training %>% 
-    filter(id != temp_id) %>% 
+    filter(id != temp_id, !(id %in% bad_ids)) %>% 
     select_if(not_all_na) %>% 
     mutate(code = fct_drop(code)) %>% 
     select(-id)
@@ -36,7 +38,8 @@ split_model <- function(temp_id, training, ntree = 50) {
 }
 
 ids <- unique(training$id)
-group_mods <- map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
+group_mods <- map(ids, ~group_model(.x, training, ntree = 50)) %>% set_names(ids)
+group_select_mods <- map(ids, ~group_model(.x, training, ntree = 50, bad_ids = bad_ids)) %>% set_names(ids)
 split_mods <- map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
 
 metrics <- function(rfmodel, testing) {
