@@ -45,10 +45,11 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-library("papaja")
+library(papaja)
 library(knitr)
 library(patchwork)
 library(tidyverse)
+library(rstatix)
 ```
 
 ```{r analysis-preferences}
@@ -58,7 +59,7 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 ```
 
 
-# Current 
+# Current Study
 
 # Methods
 
@@ -72,16 +73,26 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 
 ## Body position classification
 
-# Goal 1: Optimize and validate body position classification model
-<!--resampled-metrics, splithalf-metrics, predictions CSVs generated from tune_ml/classification_tidymodels.R -->
+# Results
 
-# Goal 2: Assess classification accuracy over long recordings
+## Goal 1: Optimize and validate body position classification model
+<!--resampled-metrics, splithalf-metrics, predictions CSVs generated from tune_ml/classification_tidymodels.R -->
+```{r}
+metrics_rs <- read_csv("data/resampled-metrics.csv") 
+metrics_sp <- read_csv("data/splithalf-metrics.csv") 
+
+
+```
+
+
+
+## Goal 2: Assess classification accuracy over long recordings
 <!-- compiled_agreement.csv, generated from analysis-pt2/compile_agreement.R -->
 
-# Goal 3: Compare classification estimates to prior literature
+## Goal 3: Compare classification estimates to prior literature
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
-# Goal 4: Examine wear time and compliance in full-day data collection
+## Goal 4: Examine wear time and compliance in full-day data collection
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
 # Discussion
