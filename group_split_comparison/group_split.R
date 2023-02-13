@@ -4,6 +4,9 @@ library(cvms)
 library(caret)
 library(tidyverse)
 library(rstatix)
+library(furrr)
+
+plan("multicore", workers = 9)
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
@@ -13,7 +16,6 @@ not_all_na <- function(x) any(!is.na(x))
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
 
-temp_id <- 9908
 bad_ids <- c(9909, 10204, 10802)
 
 group_model <- function(temp_id, training, ntree = 50, bad_ids = NULL) {
@@ -38,11 +40,12 @@ split_model <- function(temp_id, training, ntree = 50) {
 }
 
 ids <- unique(training$id)
-group_mods <- map(ids, ~group_model(.x, training, ntree = 50)) %>% set_names(ids)
-group_select_mods <- map(ids, ~group_model(.x, training, ntree = 50, bad_ids = bad_ids)) %>% set_names(ids)
-split_mods <- map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
+group_mods <- future_map(ids, ~group_model(.x, training, ntree = 50)) %>% set_names(ids)
+group_select_mods <- future_map(ids, ~group_model(.x, training, ntree = 50, bad_ids = bad_ids)) %>% set_names(ids)
+split_mods <- future_map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
 
-save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
+# save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
+# load( here("group_split_comparison","models.RData"))
 
 metrics <- function(rfmodel, testing) {
   predictions <- predict(rfmodel, testing, type = "class")
@@ -59,3 +62,4 @@ res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y
   add_column(ids) %>% add_column(model = "select")
 res_select %>% get_summary_stats(-ids)
 
+ds <- bind_rows(res_split, res_select)
