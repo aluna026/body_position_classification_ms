@@ -87,7 +87,7 @@ metrics_sp <- read_csv("data/splithalf-metrics.csv")
 
 
 ## Goal 2: Assess classification accuracy over long recordings
-<!-- compiled_agreement.csv, generated from analysis-pt2/compile_agreement.R -->
+<!-- group_split_metrics, generated from group_split_comparison in this proj -->
 
 ## Goal 3: Compare classification estimates to prior literature
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->

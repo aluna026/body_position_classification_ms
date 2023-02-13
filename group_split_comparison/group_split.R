@@ -11,13 +11,13 @@ plan("sequential")
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
-ntree = 50
+ntree = 150
 not_all_na <- function(x) any(!is.na(x))
 
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
 
-bad_ids <- c(9909, 10204, 10802)
+bad_ids <- c(9909, 9911, 10204, 10802, 11104, 11501)
 
 group_model <- function(temp_id, training, ntree = 50, bad_ids = NULL) {
   print(temp_id)
@@ -41,9 +41,9 @@ split_model <- function(temp_id, training, ntree = 50) {
 }
 
 ids <- unique(training$id)
-group_mods <- future_map(ids, ~group_model(.x, training, ntree = 50)) %>% set_names(ids)
-group_select_mods <- future_map(ids, ~group_model(.x, training, ntree = 50, bad_ids = bad_ids)) %>% set_names(ids)
-split_mods <- future_map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
+group_mods <- future_map(ids, ~group_model(.x, training)) %>% set_names(ids)
+group_select_mods <- future_map(ids, ~group_model(.x, training, bad_ids = bad_ids)) %>% set_names(ids)
+split_mods <- future_map(ids, ~split_model(.x, training)) %>% set_names(ids)
 
 # save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
 # load( here("group_split_comparison","models.RData"))
@@ -68,9 +68,12 @@ res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%
   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
   add_column(ids) %>% add_column(model = "split")
 res_split %>% get_summary_stats(-ids)
+res_split %>% arrange(`Overall Accuracy`)
 
-ds <- bind_rows(res_split, res_select) %>% bind_rows(res_group)
-write(ds, file = here("data", "group_split_metrics.csv"))
+ds <- bind_rows(res_split, res_group) %>% bind_rows(res_select)
+write_csv(ds, file = "data/group_split_metrics.csv")
 
-
+ggplot(ds, aes(x = model, y = `Overall Accuracy`)) + geom_boxplot()
+ggplot(ds, aes(x = model, y = `Balanced Accuracy`)) + geom_boxplot()
+ggplot(ds, aes(x = model, y = `Kappa`)) + geom_boxplot()
 
