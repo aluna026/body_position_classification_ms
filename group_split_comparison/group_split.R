@@ -42,11 +42,20 @@ group_mods <- map(ids, ~group_model(.x, training, ntree = 50)) %>% set_names(ids
 group_select_mods <- map(ids, ~group_model(.x, training, ntree = 50, bad_ids = bad_ids)) %>% set_names(ids)
 split_mods <- map(ids, ~split_model(.x, training, ntree = 50)) %>% set_names(ids)
 
+save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
+
 metrics <- function(rfmodel, testing) {
   predictions <- predict(rfmodel, testing, type = "class")
   u <- union(predictions, testing$code)
   res <- confusion_matrix(factor(testing$code, u),factor(predictions, u))
 }
-res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% set_names(ids)
-res_split %>% map_dbl(~ .x$`Balanced Accuracy`) %>% sort(.)
+res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
+              map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
+              add_column(ids) %>% add_column(model = "split")
+res_split %>% get_summary_stats(-ids)
+
+res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
+  map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
+  add_column(ids) %>% add_column(model = "select")
+res_select %>% get_summary_stats(-ids)
 
