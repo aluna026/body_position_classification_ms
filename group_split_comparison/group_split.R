@@ -6,7 +6,8 @@ library(tidyverse)
 library(rstatix)
 library(furrr)
 
-plan("multicore", workers = 9)
+plan("multisession", workers = 9)
+plan("sequential")
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
@@ -52,14 +53,24 @@ metrics <- function(rfmodel, testing) {
   u <- union(predictions, testing$code)
   res <- confusion_matrix(factor(testing$code, u),factor(predictions, u))
 }
-res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
-              map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
-              add_column(ids) %>% add_column(model = "split")
-res_split %>% get_summary_stats(-ids)
+
+res_group <- map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
+  map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
+  add_column(ids) %>% add_column(model = "group")
+res_group %>% get_summary_stats(-ids)
 
 res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
   add_column(ids) %>% add_column(model = "select")
 res_select %>% get_summary_stats(-ids)
 
-ds <- bind_rows(res_split, res_select)
+res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
+  map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
+  add_column(ids) %>% add_column(model = "split")
+res_split %>% get_summary_stats(-ids)
+
+ds <- bind_rows(res_split, res_select) %>% bind_rows(res_group)
+write(ds, file = here("data", "group_split_metrics.csv"))
+
+
+
