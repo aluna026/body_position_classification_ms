@@ -76,10 +76,9 @@ knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 # Results
 
 ## Goal 1: Optimize and validate body position classification model
-<!--resampled-metrics, splithalf-metrics, predictions CSVs generated from tune_ml/classification_tidymodels.R -->
+<!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
 ```{r}
-metrics_rs <- read_csv("data/resampled-metrics.csv") 
-metrics_sp <- read_csv("data/splithalf-metrics.csv") 
+metrics <- read_csv("data/group_split_metrics.csv") 
 
 
 ```
@@ -87,7 +86,12 @@ metrics_sp <- read_csv("data/splithalf-metrics.csv")
 
 
 ## Goal 2: Assess classification accuracy over long recordings
-<!-- group_split_metrics, generated from group_split_comparison in this proj -->
+<!-- compiled_agreement, generated from analysis-part2 -->
+
+```{r}
+
+```
+
 
 ## Goal 3: Compare classification estimates to prior literature
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->

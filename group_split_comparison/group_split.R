@@ -77,3 +77,5 @@ ggplot(ds, aes(x = model, y = `Overall Accuracy`)) + geom_boxplot()
 ggplot(ds, aes(x = model, y = `Balanced Accuracy`)) + geom_boxplot()
 ggplot(ds, aes(x = model, y = `Kappa`)) + geom_boxplot()
 
+ds %>% pivot_wider(id_cols = ids, names_from = model, values_from = `Overall Accuracy`) %>% 
+  ggplot(aes(x = split, y = group)) + geom_point() + xlim(0,1) + ylim(0,1) + geom_abline(slope = 1, intercept = 0)
