@@ -104,8 +104,12 @@ metrics <- read_csv("data/group_split_metrics.csv")
 ```{r}
 # Count up position totals and join into an agreement data frame
 calculate_agreement <- function(ds) {
-  model <- ds %>% count(file, pos) %>% add_count(file, wt = n, name = "total") %>% mutate(prop_model = n/total)
-  human <- ds %>% count(file, code) %>% add_count(file, wt = n, name = "total") %>% mutate(prop_human = n/total)
+  model <- ds %>% count(file, pos) %>% 
+    add_count(file, wt = n, name = "total") %>% 
+    mutate(prop_model = n/total)
+  human <- ds %>% count(file, code) %>% 
+    add_count(file, wt = n, name = "total") %>% 
+    mutate(prop_human = n/total)
   agree_group <- full_join(select(model, file, pos, prop_model), 
                      select(human, file, code, prop_human), 
                      by = c("file" = "file", "pos" = "code"))
@@ -118,7 +122,7 @@ agreement_scatter <- function(ds) {
   ggplot(ds) +
   geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
   geom_abline(intercept = 0, slope = 1) + 
-  scale_fill_manual(name = "Posture", values = pal, guide = "none") + 
+  scale_fill_manual(values = pal, guide = "none") + 
   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
   facet_wrap("pos", ncol = 2, as.table = F) +
@@ -126,9 +130,17 @@ agreement_scatter <- function(ds) {
   theme(panel.spacing.y = unit(1, "lines")) + 
   theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
 }
+
+# difference_plot <- function(ds) {
+#   ds %>% mutate(diff = prop_human - prop_model) %>% 
+#   ggplot(aes(x = pos, y = diff, color = pos)) +
+#   stat_summary() + 
+#   scale_fill_manual(values = pal, guide = "none") + 
+#   ylab("Prediction Difference (%)") + ylim(-.5, .5) + xlab("")
+# }
 ```
 
-```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant.", fig.align="center", fig.width=7, fig.height=6.7}
+```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant.", fig.align="center", fig.width=7, fig.height=6.5}
 # GROUP MODEL PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
   filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
@@ -144,8 +156,21 @@ split_agree_cor <- cor_test(agree$split, vars = c("prop_model", "prop_human")) %
 
 agree_plots <- map(agree, agreement_scatter)
 agree_plots <- map2(agree_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
-
 agree_plots[[1]] + agree_plots[[2]]
+```
+
+```{r, pt2overalltable}
+map_dfc(agree, ~ .x %>% group_by(pos) %>% 
+          cor_test(vars = c("prop_model", "prop_human")) %>% 
+          select(pos, cor))
+map_dfc(agree, ~ .x %>% filter(file != "107/3", file != "104/1") %>% group_by(pos) %>% 
+          cor_test(vars = c("prop_model", "prop_human")) %>% 
+          select(pos, cor))
+
+# difference_plots <- map(agree, difference_plot)
+# difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+# difference_plots[[1]] + difference_plots[[2]]
+
 ```
 
 
