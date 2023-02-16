@@ -56,6 +56,20 @@ library(rstatix)
 # Seed for random number generation
 set.seed(42)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+pos_levels <- c("Supine", "Prone", "Sitting", "Upright", "Held")
+pal <-  c("#E69F00","#56B4E9", "#009E73","#F0E442", "#0072B2") %>% 
+  set_names(pos_levels)
+
+theme_update(text = element_text(size = 14),
+             axis.text.x = element_text(size = 14, color = "black"), 
+             axis.title.x = element_text(size = 16),
+             axis.text.y = element_text(size = 14,  color = "black"), 
+             axis.title.y = element_text(size = 16), 
+             panel.background = element_blank(),panel.border = element_blank(), 
+             panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(), axis.line = element_blank(), 
+             legend.key = element_rect(fill = "white")) 
+
 ```
 
 
@@ -89,7 +103,33 @@ metrics <- read_csv("data/group_split_metrics.csv")
 <!-- compiled_agreement, generated from analysis-part2 -->
 
 ```{r}
+# GROUP MODEL PART 2 AGREEMENT
+pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
+  filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
+         mutate(pos = factor(pos, levels = pos_levels))
 
+# Count up position totals and join into an agreement data frame
+model <- pt2_group %>% count(file, pos) %>% add_count(file, wt = n, name = "total") %>% mutate(prop_model = n/total)
+human <- pt2_group %>% count(file, code) %>% add_count(file, wt = n, name = "total") %>% mutate(prop_human = n/total)
+agree_group <- full_join(select(model, file, pos, prop_model), 
+                   select(human, file, code, prop_human), 
+                   by = c("file" = "file", "pos" = "code"))
+agree_group <- agree_group %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
+                          prop_model = ifelse(is.na(prop_model), 0, prop_model))
+agree_group <- complete(agree_group, file, pos, fill = list(prop_human = 0, prop_model = 0))
+
+group_agree_cor <- cor_test(agree_group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+
+ggplot(agree_group) +
+  geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
+  geom_abline(intercept = 0, slope = 1) + 
+  scale_fill_manual(name = "Posture", values = pal, guide = "none") + 
+  scale_x_continuous(breaks = c(0,.25, .5, .75, 1), labels = c(0, 25, 50, 75, 100), limits = c(0, 1.07), name = "Actual Position Prevalence (%)") + 
+  scale_y_continuous(breaks = c(0,.25, .5, .75, 1), labels = c(0, 25, 50, 75, 100), limits = c(0, 1.07), name = "Predicted Position Prevalence (%)") + 
+  facet_wrap("pos", ncol = 2, as.table = F) +
+  theme(panel.spacing.x = unit(1.5, "lines")) +
+  theme(panel.spacing.y = unit(2.5, "lines")) + 
+  theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
 ```
 
 
