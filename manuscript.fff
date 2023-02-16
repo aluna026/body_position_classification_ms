@@ -1,0 +1,10 @@
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
+{\centering \includegraphics{manuscript_files/figure-latex/part2overall-1}
+
+}
+
+\caption{Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant.}\label{fig:part2overall}
+\end{figure*}
