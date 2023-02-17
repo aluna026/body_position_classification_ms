@@ -151,8 +151,7 @@ pt2_split <- read_csv("data/compiled_agreement_split.csv") %>%
 
 agree <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement)
 
-group_agree_cor <- cor_test(agree$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
-split_agree_cor <- cor_test(agree$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+
 
 agree_plots <- map(agree, agreement_scatter)
 agree_plots <- map2(agree_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
@@ -165,7 +164,19 @@ pt2corr_without_outliers <- map_dfc(agree, ~ .x %>% filter(file != "107/3", file
 pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
 rm(pt2corr_with_outliers)
 rm(pt2corr_without_outliers)
-apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)))
+
+#Overall
+group_agree_cor <- cor_test(agree$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor <- cor_test(agree$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+group_agree_cor_noout <- agree$group %>% filter(file != "107/3", file != "104/1") %>% 
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor_noout <- agree$split %>% filter(file != "107/3", file != "104/1") %>%
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
+colnames(overall_row) <- colnames(pt2corr)
+pt2corr <- bind_rows(pt2corr, overall_row)
+apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
+          midrules = 5)
 
 # difference_plots <- map(agree, difference_plot)
 # difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
