@@ -151,8 +151,6 @@ pt2_split <- read_csv("data/compiled_agreement_split.csv") %>%
 
 agree <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement)
 
-
-
 agree_plots <- map(agree, agreement_scatter)
 agree_plots <- map2(agree_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 agree_plots[[1]] + agree_plots[[2]]
@@ -181,6 +179,58 @@ apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "In
 # difference_plots <- map(agree, difference_plot)
 # difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 # difference_plots[[1]] + difference_plots[[2]]
+
+```
+
+```{r }
+calculate_agreement_bins <- function(ds) {
+  ds <- ds %>% group_by(file) %>% 
+    mutate(sample = row_number(), bin = floor(sample/300)) %>% 
+    add_count(file, bin) %>% ungroup() %>% filter(n > 200) %>% group_by(file) %>% mutate(num_bins = length(unique(bin))) %>% ungroup()
+  model <- ds %>% count(file, bin, num_bins, pos) %>% add_count(file, bin,num_bins,  wt = n, name = "total") %>% mutate(prop_model = n/total)
+  human <- ds %>% count(file, bin, num_bins,  code) %>% add_count(file, bin, num_bins, wt = n, name = "total") %>% mutate(prop_human = n/total)
+  agree <- full_join(select(model, file, pos, prop_model, bin, num_bins), 
+                     select(human, file, code, prop_human, bin, num_bins), 
+                     by = c("file" = "file", "pos" = "code", "bin" = "bin", "num_bins" = "num_bins"))
+  agree <- agree %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
+                            prop_model = ifelse(is.na(prop_model), 0, prop_model))
+  agree <- complete(agree, nesting(file, bin, num_bins), pos, fill = list(prop_human = 0, prop_model = 0))
+}
+
+agree_bins <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement_bins)
+
+# individual_scatter <- function(ds, pos_select) {
+#   ds %>% filter(pos == pos_select) %>% ggplot() +
+#   geom_abline(intercept = 0, slope = 1) + facet_wrap("file") + 
+#   geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
+#   scale_fill_manual(values = pal, guide = "none") + 
+#   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
+#   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
+#   theme(panel.spacing.x = unit(1.5, "lines")) +
+#   theme(panel.spacing.y = unit(.75, "lines")) + 
+#   theme(strip.background = element_blank(), strip.text.x = element_blank())
+# }
+
+# individual_scatter <- function(ds) {
+#   ds %>% ggplot() +
+#   geom_abline(intercept = 0, slope = 1) + facet_grid(c("file","pos")) + 
+#   geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 3) + 
+#   scale_fill_manual(values = pal, guide = "none") + 
+#   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
+#   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
+#   theme(panel.spacing.x = unit(.5, "lines")) +
+#   theme(strip.background = element_blank(), strip.text.x = element_blank()) + 
+#    theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+# }
+# individual_scatter(agree_bins$group)
+
+# agree_plots_bins <- map(agree_bins, ~ individual_scatter(.x, "Prone"))
+# agree_plots_bins <- map2(agree_plots_bins, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+# agree_plots_bins[[1]] / agree_plots_bins[[2]]
+# (individual_scatter(agree_bins$group, "Sitting") + individual_scatter(agree_bins$group, "Upright"))/
+#   (individual_scatter(agree_bins$group, "Prone") + individual_scatter(agree_bins$group, "Supine"))
+# 
+
 
 ```
 
