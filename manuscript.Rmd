@@ -199,6 +199,25 @@ calculate_agreement_bins <- function(ds) {
 
 agree_bins <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement_bins)
 
+#Bins
+pt2corr_with_outliers <- map_dfc(agree_bins, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
+pt2corr_without_outliers <- map_dfc(agree_bins, ~ .x %>% filter(file != "107/3", file != "104/1") %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
+pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
+rm(pt2corr_with_outliers)
+rm(pt2corr_without_outliers)
+
+group_agree_cor <- cor_test(agree_bins$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor <- cor_test(agree_bins$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+group_agree_cor_noout <- agree_bins$group %>% filter(file != "107/3", file != "104/1") %>% 
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor_noout <- agree_bins$split %>% filter(file != "107/3", file != "104/1") %>%
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
+colnames(overall_row) <- colnames(pt2corr)
+pt2corr <- bind_rows(pt2corr, overall_row)
+apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
+          midrules = 5)
+
 # individual_scatter <- function(ds, pos_select) {
 #   ds %>% filter(pos == pos_select) %>% ggplot() +
 #   geom_abline(intercept = 0, slope = 1) + facet_wrap("file") + 
