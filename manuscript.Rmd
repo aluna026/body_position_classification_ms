@@ -134,10 +134,12 @@ calculate_agreement <- function(ds) {
 agree <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement)
 
 agreement_scatter <- function(ds) {
-  ggplot(ds) +
-  geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
+  ggplot() +
+  geom_point(data = filter(ds, file %in% outlier_files), mapping = aes(x = prop_human, y = prop_model, shape = file, fill = pos), color = "#333333", size = 4, alpha = .5) + 
+  geom_point(data = filter_outliers(ds), mapping = aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
   geom_abline(intercept = 0, slope = 1) + 
   scale_fill_manual(values = pal, guide = "none") + 
+  scale_shape_discrete(guide = "none") + 
   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
   facet_wrap("pos", ncol = 2, as.table = F) +
@@ -173,7 +175,7 @@ apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "In
 
 ```
 
-```{r }
+```{r part2bins, warning=FALSE, fig.cap="Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the long delay period. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5}
 calculate_agreement_bins <- function(ds) {
   ds <- ds %>% group_by(file) %>% 
     mutate(sample = row_number(), bin = floor(sample/300)) %>% 
@@ -184,7 +186,8 @@ calculate_agreement_bins <- function(ds) {
                      select(human, file, code, prop_human, bin, num_bins), 
                      by = c("file" = "file", "pos" = "code", "bin" = "bin", "num_bins" = "num_bins"))
   agree <- agree %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
-                            prop_model = ifelse(is.na(prop_model), 0, prop_model))
+                            prop_model = ifelse(is.na(prop_model), 0, prop_model),
+                            pos - factor(pos, levels = pos_levels))
   agree <- complete(agree, nesting(file, bin, num_bins), pos, fill = list(prop_human = 0, prop_model = 0))
 }
 
@@ -212,48 +215,18 @@ apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "In
 difference_plot <- function(ds) {
   ds <- mutate(ds, diff = prop_human - prop_model)
   ggplot(filter_outliers(ds), aes(x = pos, y = diff, color = pos, group = file)) +
+  geom_rect(aes(xmin = "Held", xmax = "Upright",ymin = -.1, ymax = .1), fill = "#e5e5e5", color = "#e5e5e5") + 
   stat_summary(position = position_dodge(.4), alpha = .7) +
-  stat_summary(data = filter(ds, file %in% c("107/3", "104/1", "106/1")), position = position_dodge(.4), alpha = .7, color = "darkgray") +
+  stat_summary(data = filter(ds, file %in% outlier_files), position = position_dodge(.4), aes(shape = file), alpha = .7, color = "#333333") +
   scale_color_manual(values = pal, guide = "none") +
+  scale_shape_discrete(guide = "none") + 
   coord_cartesian(ylim = c(-1, 1)) + xlab("") + 
-  scale_y_continuous(name = "Prediction Difference (min)", breaks = seq(-1, 1, .2), labels = seq(-10, 10, 2), minor_breaks = waiver())
+  scale_y_continuous(name = "Prediction Difference (min)", breaks = seq(-1, 1, .2), labels = seq(-10, 10, 2), minor_breaks = waiver()) + 
+    theme(axis.text.x = element_text(size = 13, color = "black"))
 }
 difference_plots <- map(agree_bins, ~ difference_plot(.x))
 difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 difference_plots[[1]] + difference_plots[[2]]
-
-# individual_scatter <- function(ds, pos_select) {
-#   ds %>% filter(pos == pos_select) %>% ggplot() +
-#   geom_abline(intercept = 0, slope = 1) + facet_wrap("file") + 
-#   geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
-#   scale_fill_manual(values = pal, guide = "none") + 
-#   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
-#   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
-#   theme(panel.spacing.x = unit(1.5, "lines")) +
-#   theme(panel.spacing.y = unit(.75, "lines")) + 
-#   theme(strip.background = element_blank(), strip.text.x = element_blank())
-# }
-
-# individual_scatter <- function(ds) {
-#   ds %>% ggplot() +
-#   geom_abline(intercept = 0, slope = 1) + facet_grid(c("file","pos")) + 
-#   geom_point(aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 3) + 
-#   scale_fill_manual(values = pal, guide = "none") + 
-#   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
-#   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
-#   theme(panel.spacing.x = unit(.5, "lines")) +
-#   theme(strip.background = element_blank(), strip.text.x = element_blank()) + 
-#    theme(axis.text.x = element_blank(), axis.text.y = element_blank())
-# }
-# individual_scatter(agree_bins$group)
-
-# agree_plots_bins <- map(agree_bins, ~ individual_scatter(.x, "Prone"))
-# agree_plots_bins <- map2(agree_plots_bins, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
-# agree_plots_bins[[1]] / agree_plots_bins[[2]]
-# (individual_scatter(agree_bins$group, "Sitting") + individual_scatter(agree_bins$group, "Upright"))/
-#   (individual_scatter(agree_bins$group, "Prone") + individual_scatter(agree_bins$group, "Supine"))
-# 
-
 
 ```
 
