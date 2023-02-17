@@ -160,12 +160,12 @@ agree_plots[[1]] + agree_plots[[2]]
 ```
 
 ```{r, pt2overalltable}
-map_dfc(agree, ~ .x %>% group_by(pos) %>% 
-          cor_test(vars = c("prop_model", "prop_human")) %>% 
-          select(pos, cor))
-map_dfc(agree, ~ .x %>% filter(file != "107/3", file != "104/1") %>% group_by(pos) %>% 
-          cor_test(vars = c("prop_model", "prop_human")) %>% 
-          select(pos, cor))
+pt2corr_with_outliers <- map_dfc(agree, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
+pt2corr_without_outliers <- map_dfc(agree, ~ .x %>% filter(file != "107/3", file != "104/1") %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
+pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
+rm(pt2corr_with_outliers)
+rm(pt2corr_without_outliers)
+apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)))
 
 # difference_plots <- map(agree, difference_plot)
 # difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
