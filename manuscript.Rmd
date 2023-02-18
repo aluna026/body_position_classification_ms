@@ -48,6 +48,7 @@ editor_options:
 library(papaja)
 library(knitr)
 library(patchwork)
+library(scales)
 library(tidyverse)
 library(rstatix)
 ```
@@ -98,11 +99,42 @@ metrics <- read_csv("data/group_split_metrics.csv")
 ```
 
 
+```{r timelines, warning=FALSE, fig.cap="Timelines", fig.align="center", fig.width=7.75, fig.height=8}
+fullday <- read_csv("data/imu-compiled.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA))
+fullday_long <- fullday %>% pivot_longer(cols = nap_time:upright_time, names_to = "position", values_to = "prop") %>% 
+  mutate(Position = factor(position,
+                           levels = c("nap_time","upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
+                           labels = c("Nap","Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
+  arrange(Position, age)
+
+timelines <- function(ds) {
+  ggplot(ds, aes(x = clock_time_start, y = prop, fill = Position)) + 
+  geom_bar(stat = "identity") + 
+  facet_wrap("id_uni",ncol = 1, strip.position = "left") + 
+  scale_fill_manual(values = c("Nap" = "gray",pal)) + 
+  scale_x_time(breaks = breaks_width("2 hour"), name = "", minor_breaks = waiver()) + 
+  theme(legend.position = "bottom", 
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 10, color = "black", angle = 315, hjust = -.15),
+        strip.background = element_blank(),
+        strip.text.y = element_blank()) + ylab("")
+}
+
+timeline_plots <- map(c("Younger", "Older"), ~ timelines(filter(fullday_long, group == .x)))
+timeline_plots <- map2(timeline_plots, c("A. 4-7 Months", "B. 11-14 Months"), ~ .x + ggtitle(.y))
+timeline_plots[[1]] + timeline_plots[[2]]
+
+```
+
 
 ## Goal 2: Assess classification accuracy over long recordings
 <!-- compiled_agreement, generated from analysis-part2 -->
 
-```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant.", fig.align="center", fig.width=7, fig.height=6.5}
+```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=7, fig.height=6.5}
 
 # PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
@@ -154,6 +186,7 @@ agree_plots[[1]] + agree_plots[[2]]
 ```
 
 ```{r, pt2overalltable}
+#By posture
 pt2corr_with_outliers <- map_dfc(agree, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
 pt2corr_without_outliers <- map_dfc(agree, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
 pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
@@ -171,8 +204,7 @@ overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_c
 colnames(overall_row) <- colnames(pt2corr)
 pt2corr <- bind_rows(pt2corr, overall_row)
 apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
-          midrules = 5)
-
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
 ```
 
 ```{r part2bins, warning=FALSE, fig.cap="Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the long delay period. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5}
@@ -193,25 +225,6 @@ calculate_agreement_bins <- function(ds) {
 
 agree_bins <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement_bins)
 
-#Bins
-pt2corr_with_outliers <- map_dfc(agree_bins, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
-pt2corr_without_outliers <- map_dfc(agree_bins, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
-pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
-rm(pt2corr_with_outliers)
-rm(pt2corr_without_outliers)
-
-group_agree_cor <- cor_test(agree_bins$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
-split_agree_cor <- cor_test(agree_bins$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
-group_agree_cor_noout <- agree_bins$group %>% filter_outliers %>% 
-  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
-split_agree_cor_noout <- agree_bins$split %>% filter_outliers %>%
-  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
-overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
-colnames(overall_row) <- colnames(pt2corr)
-pt2corr <- bind_rows(pt2corr, overall_row)
-apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
-          midrules = 5)
-
 difference_plot <- function(ds) {
   ds <- mutate(ds, diff = prop_human - prop_model)
   ggplot(filter_outliers(ds), aes(x = pos, y = diff, color = pos, group = file)) +
@@ -227,12 +240,60 @@ difference_plot <- function(ds) {
 difference_plots <- map(agree_bins, ~ difference_plot(.x))
 difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 difference_plots[[1]] + difference_plots[[2]]
-
 ```
 
+```{r pt2binstable}
+#Bins
+pt2corr_with_outliers <- map_dfc(agree_bins, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
+pt2corr_without_outliers <- map_dfc(agree_bins, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
+pt2corr_bins <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
+rm(pt2corr_with_outliers)
+rm(pt2corr_without_outliers)
+
+group_agree_cor <- cor_test(agree_bins$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor <- cor_test(agree_bins$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+group_agree_cor_noout <- agree_bins$group %>% filter_outliers %>% 
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor_noout <- agree_bins$split %>% filter_outliers %>%
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
+colnames(overall_row) <- colnames(pt2corr_bins)
+pt2corr_bins <- bind_rows(pt2corr_bins, overall_row)
+rm(overall_row)
+apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
+```
 
 ## Goal 3: Compare classification estimates to prior literature
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
+
+```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=5, fig.height=8}
+fullday <- read_csv("data/imu-compiled.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA))
+fullday_long <- fullday %>% pivot_longer(cols = sit_time:upright_time, names_to = "position", values_to = "prop") %>% 
+  mutate(position = factor(position,
+                           levels = c("upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
+                           labels = c("Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
+  arrange(position, age)
+
+outlier_ids <- c(10701, 10401, 10601)
+fullday %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
+fullday %>% filter(!(id_uni %in% outlier_ids)) %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
+
+fullday_long %>% drop_na(prop) %>% 
+  ggplot() + facet_wrap("position", as.table = T, ncol = 2) + 
+  geom_smooth(aes(x = age, y = prop), color = "darkgray", method = "lm", se = T) + 
+  stat_summary(fun = "mean", mapping = aes(x = age, y = prop, group = id_uni, fill = position), shape = 21, size = .75) + 
+  scale_fill_manual(values = pal, guide = "none") + 
+  scale_x_continuous(name = "Age (months)", breaks = seq(3, 15, 3), limits = c(3,15)) + 
+  ylim(0,1) + ylab("Proportion of waking day")
+
+fullday_long %>% group_by(position, group) %>% get_summary_stats(prop)
+
+```
+
 
 ## Goal 4: Examine wear time and compliance in full-day data collection
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->

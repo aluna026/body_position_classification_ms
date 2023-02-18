@@ -5,7 +5,7 @@
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:pt2overalltable}}
+\caption{\label{tab:pt2overalltable}Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule
@@ -33,7 +33,7 @@ Overall & 0.79 & 0.90 & 0.95 & 0.96\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:part2bins}}
+\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule
