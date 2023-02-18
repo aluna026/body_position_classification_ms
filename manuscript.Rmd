@@ -293,7 +293,10 @@ age_scatter <- function(ds) {
   stat_summary(fun = "mean", mapping = aes(x = age, y = prop, group = id_uni, fill = position), shape = 21, size = .75, alpha = .7) + 
   scale_fill_manual(values = pal, guide = "none") + 
   scale_x_continuous(name = "Age (months)", breaks = seq(3, 15, 3), limits = c(3,15)) + 
-  ylim(0,1) + ylab("Proportion of waking day")
+  ylim(0,1) + ylab("Proportion of waking day") + 
+  theme(panel.spacing.x = unit(.5, "lines")) +
+  theme(panel.spacing.y = unit(1, "lines")) + 
+  theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
 }
 
 age_plots <- map(fullday, fullday_long) %>% map(age_scatter)
