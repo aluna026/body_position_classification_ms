@@ -2,6 +2,16 @@
 \ifnextchar[{\eatarg}{}
 
 
+{\centering \includegraphics{manuscript_files/figure-latex/metrics-1}
+
+}
+
+\caption{Metrics}\label{fig:metrics}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
 {\centering \includegraphics{manuscript_files/figure-latex/timelines-1}
 
 }

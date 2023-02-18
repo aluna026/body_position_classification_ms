@@ -49,6 +49,7 @@ library(papaja)
 library(knitr)
 library(patchwork)
 library(scales)
+library(ggforce)
 library(tidyverse)
 library(rstatix)
 ```
@@ -92,9 +93,31 @@ theme_update(text = element_text(size = 14),
 
 ## Goal 1: Optimize and validate body position classification model
 <!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
-```{r}
-metrics <- read_csv("data/group_split_metrics.csv") 
+```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=5, fig.height=8}
+metrics <- read_csv("data/group_split_metrics.csv") %>% 
+  filter(model %in% c("group", "split")) %>% 
+  mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
 
+metrics_long <- metrics %>% pivot_longer(cols = `Overall Accuracy`:Kappa, 
+                                         names_to = "metric",
+                                         values_to = "value")
+
+metric_plot <- function(ds, met) {
+  ds %>% filter(metric == met) %>% 
+    ggplot(aes(x = Model, y = value, shape = Model)) + 
+    geom_sina(alpha = .7, fill = "orange", size = 4, maxwidth = .5) +
+    stat_summary(fun = "mean", mapping = aes(x = Model, y = value), shape = "-", fill = "black", size = 4) + 
+    scale_shape_manual(guide = "none", values = c(21,23)) + 
+    ylim(0, 1) + ylab(met) + xlab("") + 
+    theme(plot.title.position = "plot",
+          axis.title.y = element_text(size = 13),
+          axis.text.y = element_text(size = 11),
+          axis.text.x = element_text(size = 13))
+}
+metric_labels <- c("Overall Accuracy", "Balanced Accuracy", "F1", "Sensitivity", "Pos Pred Value", "Kappa")
+title_labels <- c("A. Overall Accuracy", "B. Balanced Accuracy", "C. F1 Score", "D. Sensitivity", "E. Pos. Pred. Value", "F. Kappa")
+metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., title_labels, ~.x + ggtitle(.y))
+(metric_plots[[1]] + metric_plots[[2]])/(metric_plots[[3]]+metric_plots[[4]])/(metric_plots[[5]] + metric_plots[[6]])
 
 ```
 
