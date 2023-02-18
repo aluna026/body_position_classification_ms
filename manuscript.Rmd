@@ -267,30 +267,44 @@ apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group"
 ## Goal 3: Compare classification estimates to prior literature
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
-```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=5, fig.height=8}
-fullday <- read_csv("data/imu-compiled.csv") %>% 
+```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7}
+fullday_group <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
          nap_time = ifelse(is.na(sit_time), nap_time, NA))
-fullday_long <- fullday %>% pivot_longer(cols = sit_time:upright_time, names_to = "position", values_to = "prop") %>% 
+fullday_split <- read_csv("data/imu-compiled-split.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA))
+fullday <- list("group" = fullday_group, "split" = fullday_split)
+
+fullday_long <- function(ds) {
+  ds %>% pivot_longer(cols = sit_time:upright_time, names_to = "position", values_to = "prop") %>% 
   mutate(position = factor(position,
                            levels = c("upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
                            labels = c("Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
   arrange(position, age)
+}
 
-outlier_ids <- c(10701, 10401, 10601)
-fullday %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
-fullday %>% filter(!(id_uni %in% outlier_ids)) %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
-
-fullday_long %>% drop_na(prop) %>% 
+age_scatter <- function(ds) {
+  ds %>% drop_na(prop) %>% 
   ggplot() + facet_wrap("position", as.table = T, ncol = 2) + 
-  geom_smooth(aes(x = age, y = prop), color = "darkgray", method = "lm", se = T) + 
-  stat_summary(fun = "mean", mapping = aes(x = age, y = prop, group = id_uni, fill = position), shape = 21, size = .75) + 
+  geom_smooth(aes(x = age, y = prop), color = "#191919", method = "lm", se = T) + 
+  stat_summary(fun = "mean", mapping = aes(x = age, y = prop, group = id_uni, fill = position), shape = 21, size = .75, alpha = .7) + 
   scale_fill_manual(values = pal, guide = "none") + 
   scale_x_continuous(name = "Age (months)", breaks = seq(3, 15, 3), limits = c(3,15)) + 
   ylim(0,1) + ylab("Proportion of waking day")
+}
 
-fullday_long %>% group_by(position, group) %>% get_summary_stats(prop)
+age_plots <- map(fullday, fullday_long) %>% map(age_scatter)
+age_plots <- map2(age_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+age_plots[[1]] + age_plots[[2]]
+
+# outlier_ids <- c(10701, 10401, 10601)
+# fullday %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
+# fullday %>% filter(!(id_uni %in% outlier_ids)) %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
+# 
+# fullday_long %>% group_by(position, group) %>% get_summary_stats(prop)
 
 ```
 
