@@ -50,6 +50,7 @@ library(knitr)
 library(patchwork)
 library(scales)
 library(ggforce)
+library(hms)
 library(tidyverse)
 library(rstatix)
 ```
@@ -138,15 +139,17 @@ fullday_long <- fullday %>% pivot_longer(cols = nap_time:upright_time, names_to 
   arrange(Position, age)
 
 timelines <- function(ds) {
+  lims <- as_hms(c('09:00:00', '21:59:00'))
+  breaks = as_hms(c('09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00', '21:00:00'))
   ggplot(ds, aes(x = clock_time_start, y = prop, fill = Position)) + 
   geom_bar(stat = "identity") + 
   facet_wrap("id_uni",ncol = 1, strip.position = "left") + 
   scale_fill_manual(values = c("Nap" = "gray",pal)) + 
-  scale_x_time(breaks = breaks_width("2 hour"), name = "", minor_breaks = waiver()) + 
+  scale_x_time(breaks = breaks_width("4 hour"), name = "", limits = lims) + 
   theme(legend.position = "bottom", 
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
-        axis.text.x = element_text(size = 10, color = "black", angle = 315, hjust = -.15),
+        axis.text.x = element_text(size = 10, color = "black"),
         strip.background = element_blank(),
         strip.text.y = element_blank()) + ylab("")
 }
