@@ -119,6 +119,10 @@ title_labels <- c("A. Overall Accuracy", "B. Balanced Accuracy", "C. F1 Score", 
 metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., title_labels, ~.x + ggtitle(.y))
 (metric_plots[[1]] + metric_plots[[2]])/(metric_plots[[3]]+metric_plots[[4]])/(metric_plots[[5]] + metric_plots[[6]])
 
+#Worst three Kappa individuals are 9, 111-4, and 120-2
+#Worst three Kappa groups are 9, 110-4
+#Worst three Overall Accuracy (grouped) are 104-1, 106-1, 108-2 (first two are pt 2 outliers)
+
 ```
 
 
