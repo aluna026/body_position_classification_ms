@@ -125,6 +125,22 @@ metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., 
 
 ```
 
+```{r metricstable}
+
+metrics_long %>% group_by(Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity") %>% 
+  relocate(mean_Group, .after = median_Group) %>% 
+  relocate(sd_Group, .after = mean_Group) %>% 
+  mutate(across(-metric, ~ apa_num(.x, digits = 3)),
+         metric = factor(metric, levels = metric_labels)) %>% 
+  arrange(metric) %>% 
+  apa_table(., col.names = c("Metric", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)),
+          caption = "Summary statistics for model performance metrics shown separately for group and individual models.")
+```
+
 ## Goal 2: Assess classification accuracy over long recordings
 <!-- compiled_agreement, generated from analysis-part2 -->
 

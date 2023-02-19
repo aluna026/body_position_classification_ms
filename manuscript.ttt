@@ -5,6 +5,34 @@
 \begin{center}
 \begin{threeparttable}
 
+\caption{\label{tab:metricstable}Summary statistics for model performance metrics shown separately for group and individual models.}
+
+\begin{tabular}{lllllll}
+\toprule
+ & \multicolumn{3}{c}{Group} & \multicolumn{3}{c}{Individual} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7}
+Metric & Median & Mean & SD & Median & Mean & SD\\
+\midrule
+Overall Accuracy & 0.908 & 0.848 & 0.143 & 0.936 & 0.919 & 0.071\\
+Balanced Accuracy & 0.909 & 0.897 & 0.074 & 0.916 & 0.907 & 0.072\\
+F1 & 0.813 & 0.827 & 0.101 & 0.873 & 0.870 & 0.089\\
+Sensitivity & 0.840 & 0.836 & 0.123 & 0.848 & 0.840 & 0.121\\
+Pos Pred Value & 0.822 & 0.815 & 0.125 & 0.915 & 0.899 & 0.108\\
+Kappa & 0.769 & 0.757 & 0.160 & 0.846 & 0.820 & 0.141\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table*}
+\begin{table*}[hbt]
+\ifnextchar[{\eatarg}{}
+[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
 \caption{\label{tab:pt2overalltable}Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
@@ -61,7 +89,7 @@ Overall & 0.80 & 0.92 & 0.92 & 0.94\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:agetable}Summary of age differences in full-day body position for younger (4- to 7-month) and older (11- to 14-month) infants. Values shown are the mean percent of time for each body position averaged across infants in each group.  extit\{SD\} is shown in parentheses. Estimates are shown separately for group and individual models.}
+\caption{\label{tab:agetable}Summary of age differences in full-day body position for younger (4- to 7-month) and older (11- to 14-month) infants. Values shown are the mean percent of time for each body position averaged across infants in each group. Standard deviations are shown in parentheses. Descriptive statistics are shown separately for group and individual models.}
 
 \begin{tabular}{lllll}
 \toprule
