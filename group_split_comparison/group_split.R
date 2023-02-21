@@ -42,7 +42,7 @@ split_model <- function(temp_id, training, ntree = 50) {
 
 ids <- unique(training$id)
 group_mods <-map(ids, ~group_model(.x, training)) %>% set_names(ids)
-group_select_mods <- map(ids, ~group_model(.x, training, bad_ids = bad_ids)) %>% set_names(ids)
+# group_select_mods <- map(ids, ~group_model(.x, training, bad_ids = bad_ids)) %>% set_names(ids)
 split_mods <- map(ids, ~split_model(.x, training)) %>% set_names(ids)
 
 # save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
@@ -59,10 +59,10 @@ res_group <- map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%
   add_column(ids) %>% add_column(model = "group")
 res_group %>% get_summary_stats(-ids)
 
-res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
-  map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
-  add_column(ids) %>% add_column(model = "select")
-res_select %>% get_summary_stats(-ids)
+# res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
+#   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
+#   add_column(ids) %>% add_column(model = "select")
+# res_select %>% get_summary_stats(-ids)
 
 res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
@@ -70,12 +70,24 @@ res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%
 res_split %>% get_summary_stats(-ids)
 res_split %>% arrange(`Overall Accuracy`)
 
-ds <- bind_rows(res_split, res_group) %>% bind_rows(res_select)
+ds <- bind_rows(res_split, res_group) # %>% bind_rows(res_select)
 write_csv(ds, file = "data/group_split_metrics.csv")
 
-ggplot(ds, aes(x = model, y = `Overall Accuracy`)) + geom_boxplot()
-ggplot(ds, aes(x = model, y = `Balanced Accuracy`)) + geom_boxplot()
-ggplot(ds, aes(x = model, y = `Kappa`)) + geom_boxplot()
+res_group_class <-  map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%  
+  map2_dfr(ids, ~ .x$`Class Level Results`[[1]] %>% 
+                          select(-(Support:Table)) %>% 
+                          mutate(id = .y, model = "group"))
+res_split_class <-  map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%  
+  map2_dfr(ids, ~ .x$`Class Level Results`[[1]] %>% 
+             select(-(Support:Table)) %>% 
+             mutate(id = .y, model = "split"))
 
-ds %>% pivot_wider(id_cols = ids, names_from = model, values_from = `Overall Accuracy`) %>% 
-  ggplot(aes(x = split, y = group)) + geom_point() + xlim(0,1) + ylim(0,1) + geom_abline(slope = 1, intercept = 0)
+ds_class <- bind_rows(res_split_class, res_group_class) 
+write_csv(ds_class, file = "data/group_split_metrics_class.csv")
+
+# ggplot(ds, aes(x = model, y = `Overall Accuracy`)) + geom_boxplot()
+# ggplot(ds, aes(x = model, y = `Balanced Accuracy`)) + geom_boxplot()
+# ggplot(ds, aes(x = model, y = `Kappa`)) + geom_boxplot()
+# 
+# ds %>% pivot_wider(id_cols = ids, names_from = model, values_from = `Overall Accuracy`) %>% 
+#   ggplot(aes(x = split, y = group)) + geom_point() + xlim(0,1) + ylim(0,1) + geom_abline(slope = 1, intercept = 0)
