@@ -154,6 +154,37 @@ metrics_long %>% group_by(Model, metric) %>%
           caption = "Summary statistics for model performance metrics shown separately for group and individual models.")
 ```
 
+\renewcommand{\arraystretch}{.75}
+```{r metricsbyclass}
+metrics_class <- read_csv("data/group_split_metrics_class.csv") %>% 
+  filter(model %in% c("group", "split")) %>% 
+  mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
+
+metrics_long_class <- metrics_class %>% pivot_longer(cols = `Balanced Accuracy`:Kappa, 
+                                         names_to = "metric",
+                                         values_to = "value")
+
+metrics_long_summary <- metrics_long_class %>% group_by(Class,Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity") %>% 
+  relocate(mean_Group, .after = median_Group) %>% 
+  relocate(sd_Group, .after = mean_Group) %>% 
+  mutate(across(-(Class:metric), ~ apa_num(.x, digits = 3)),
+         metric = factor(metric, levels = metric_labels),
+         Class = factor(Class, levels = c("Supine", "Prone", "Sitting", "Upright", "Held"))) %>% 
+  relocate(metric, .before = Class) %>% 
+  arrange(metric, Class) 
+
+class_table <- metrics_long_summary %>% mutate(metric = as.character(metric))
+class_table$metric[duplicated(class_table$metric)] <- " "
+
+apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD", "Median", "Mean", "SD"), col_spanners = list("Group" = c(3, 5), "Individual" = c(6, 8)),
+          midrules = c(5, 10, 15, 20),
+          caption = "Model performance metrics for each body position class, shown separately for group and individual models.")
+```
+
 ## Goal 2: Assess classification accuracy over long recordings
 <!-- compiled_agreement, generated from analysis-part2 -->
 

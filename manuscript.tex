@@ -227,7 +227,7 @@ Abstract
 
 }
 
-\caption{Example Timeline Caption.}\label{fig:unnamed-chunk-1}
+\caption{Example Timeline Caption.}\label{fig:exemplartimeline}
 \end{figure}
 
 \hypertarget{body-position-annotation}{%
@@ -270,6 +270,54 @@ F1 & 0.813 & 0.827 & 0.101 & 0.873 & 0.870 & 0.089\\
 Sensitivity & 0.840 & 0.836 & 0.123 & 0.848 & 0.840 & 0.121\\
 Pos Pred Value & 0.822 & 0.815 & 0.125 & 0.915 & 0.899 & 0.108\\
 Kappa & 0.769 & 0.757 & 0.160 & 0.846 & 0.820 & 0.141\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\renewcommand{\arraystretch}{.75}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:metricsbyclass}Summary statistics for model performance metrics shown separately for group and individual models.}
+
+\begin{tabular}{llllllll}
+\toprule
+ &  & \multicolumn{3}{c}{Group} & \multicolumn{3}{c}{Individual} \\
+\cmidrule(r){3-5} \cmidrule(r){6-8}
+Metric & Position & Median & Mean & SD & Median & Mean & SD\\
+\midrule
+Balanced Accuracy & Supine & 0.977 & 0.935 & 0.099 & 0.995 & 0.957 & 0.090\\
+ & Prone & 0.997 & 0.950 & 0.110 & 0.983 & 0.921 & 0.132\\
+ & Sitting & 0.932 & 0.861 & 0.151 & 0.973 & 0.943 & 0.071\\
+ & Upright & 0.930 & 0.867 & 0.146 & 0.937 & 0.877 & 0.123\\
+ & Held & 0.907 & 0.872 & 0.111 & 0.892 & 0.854 & 0.153\\ \midrule
+F1 & Supine & 0.952 & 0.873 & 0.173 & 0.987 & 0.937 & 0.130\\
+ & Prone & 0.965 & 0.923 & 0.124 & 0.958 & 0.889 & 0.186\\
+ & Sitting & 0.897 & 0.805 & 0.247 & 0.963 & 0.927 & 0.101\\
+ & Upright & 0.781 & 0.748 & 0.235 & 0.868 & 0.769 & 0.227\\
+ & Held & 0.813 & 0.783 & 0.163 & 0.862 & 0.786 & 0.240\\ \midrule
+Sensitivity & Supine & 1.000 & 0.945 & 0.125 & 1.000 & 0.948 & 0.141\\
+ & Prone & 1.000 & 0.907 & 0.216 & 0.988 & 0.856 & 0.266\\
+ & Sitting & 0.901 & 0.787 & 0.291 & 0.977 & 0.917 & 0.136\\
+ & Upright & 0.878 & 0.767 & 0.275 & 0.893 & 0.790 & 0.255\\
+ & Held & 0.867 & 0.774 & 0.229 & 0.817 & 0.722 & 0.309\\ \midrule
+Pos Pred Value & Supine & 0.973 & 0.802 & 0.300 & 1.000 & 0.939 & 0.131\\
+ & Prone & 0.991 & 0.896 & 0.196 & 0.993 & 0.901 & 0.197\\
+ & Sitting & 0.910 & 0.840 & 0.238 & 0.967 & 0.947 & 0.078\\
+ & Upright & 0.848 & 0.743 & 0.285 & 0.875 & 0.817 & 0.205\\
+ & Held & 0.917 & 0.803 & 0.247 & 0.949 & 0.872 & 0.232\\ \midrule
+Kappa & Supine & 0.932 & 0.770 & 0.307 & 0.984 & 0.913 & 0.169\\
+ & Prone & 0.951 & 0.887 & 0.208 & 0.948 & 0.851 & 0.242\\
+ & Sitting & 0.836 & 0.712 & 0.308 & 0.946 & 0.889 & 0.134\\
+ & Upright & 0.729 & 0.700 & 0.277 & 0.829 & 0.744 & 0.232\\
+ & Held & 0.786 & 0.733 & 0.219 & 0.845 & 0.744 & 0.280\\
 \bottomrule
 \end{tabular}
 

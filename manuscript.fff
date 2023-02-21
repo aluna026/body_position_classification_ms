@@ -6,7 +6,7 @@
 
 }
 
-\caption{Example Timeline Caption.}\label{fig:unnamed-chunk-1}
+\caption{Example Timeline Caption.}\label{fig:exemplartimeline}
 \end{figure*}
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
