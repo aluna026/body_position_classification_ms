@@ -2,6 +2,16 @@
 \ifnextchar[{\eatarg}{}
 
 
+{\centering \includegraphics[width=0.9\linewidth]{figures/timeline}
+
+}
+
+\caption{Example Timeline Caption.}\label{fig:unnamed-chunk-1}
+\end{figure*}
+\begin{figure*}[hbt]
+\ifnextchar[{\eatarg}{}
+
+
 {\centering \includegraphics{manuscript_files/figure-latex/metrics-1}
 
 }
