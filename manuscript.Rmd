@@ -80,11 +80,33 @@ Infants' movements facilitate and constrain how they interact with their surroun
 
 In this paper, we present an inertial sensing method to classify infant body position from moment-to-moment across an entire day, and validate its accuracy using XX hours of video recorded across XX in-home data collection sessions. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences using wearable audio recorders such as the LENA device. We begin by describing the impact of long-form audio recordings on research in developmental psychology, and identify the key features of the method that should be replicated in long-form recordings of motor behavior. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief sessions [CITES], the current investigation takes a needed step forward by testing accuracy over long recordings.
 
-## Inspiration from Long-Form Audio Recordings
+## Inspiration from Long-Form Audio Methods
+
+Impactful findings
+- individual differences in experiences
+- distribution of experiences (burstiness)
+- moderators of experience (RT, Malachowski body position)
+
+Key features
+- unobtrusive (Bergelson; CTL stuff)
+- mobile (no limits to where recording happens)
+- real time
+- long duration (capture entire day and heterogeniety in activities)
+- automatic classification (scaling)
 
 ## Limitations of Video and Survey Methods
 
+Video. Only advantage is real time
+
+Survey. Everything but real time
+
 ## Promise of Inertial Sensing Methods
+
+Wear time is not an issue. Lots of Smith and other studies with long recordings.
+
+Classification accuracy from ML is good. older papers; Airaksinen; Frontiers
+
+What's missing
 
 ## Goals of the Current Study
 
