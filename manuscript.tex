@@ -206,8 +206,10 @@ Abstract
 \begin{document}
 \maketitle
 
-\hypertarget{current-study}{%
-\section{Current Study}\label{current-study}}
+Infants' movements facilitate and constrain how they interact with their surroundings from moment to moment. Changes in \emph{body position}---whether infants are supine on their backs, prone on their bellies, sitting, upright, or held by a caregiver---have immediate consequences for vision, object exploration, and social interaction. When sitting and upright, infants have a better view of faces and distant objects compared to their view while in a prone position (Franchak et al., 2018; Kretch et al., 2014; Luo \& Franchak, 2020). Infants struggle to manipulate objects while supine and prone, but sitting affords object exploration (Soska \& Adolph, 2014). Upright walking changes how infants and caregivers interact compared with crawling in a prone position; while walking infants move farther away, share toys in different ways, and hear different language from caregivers (Chen et al., 2022; Karasik et al., 2011, 2014; West \& Iverson, 2021). As infants grow older and acquire new abilities, such as independent sitting and walking, the spend more time sitting and upright and less time held, supine, and prone (Adolph \& Tamis-LeMonda, 2014; Franchak et al., 2018; Franchak, 2019; Thurman \& Corbetta, 2017). Thus, characterizing individual differences in the day-to-day accumulation of body position experiences informs developmental theory by revealing differential opportunities for learning.
+
+\hypertarget{goals-of-the-current-study}{%
+\section{Goals of the Current Study}\label{goals-of-the-current-study}}
 
 \hypertarget{methods}{%
 \section{Methods}\label{methods}}
@@ -223,7 +225,7 @@ Abstract
 
 \begin{figure}
 
-{\centering \includegraphics[width=0.9\linewidth]{figures/timeline} 
+{\centering \includegraphics[width=0.99\linewidth]{figures/timeline} 
 
 }
 
@@ -239,8 +241,8 @@ Abstract
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-\hypertarget{goal-1-optimize-and-validate-body-position-classification-model}{%
-\subsection{Goal 1: Optimize and validate body position classification model}\label{goal-1-optimize-and-validate-body-position-classification-model}}
+\hypertarget{goal-1-assess-the-proximal-accuracy-of-body-position-classification-models}{%
+\subsection{Goal 1: Assess the proximal accuracy of body position classification models}\label{goal-1-assess-the-proximal-accuracy-of-body-position-classification-models}}
 
 \begin{figure}
 
@@ -285,7 +287,7 @@ Kappa & 0.769 & 0.757 & 0.160 & 0.846 & 0.820 & 0.141\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metricsbyclass}Model performance metrics for each body position class, shown separately for group and individual models.}
+\caption{\label{tab:metricsbyclass}Model performance metrics for each body position category, shown separately for group and individual models.}
 
 \begin{tabular}{llllllll}
 \toprule
@@ -326,8 +328,8 @@ Kappa & Supine & 0.932 & 0.770 & 0.307 & 0.984 & 0.913 & 0.169\\
 
 \end{table}
 
-\hypertarget{goal-2-assess-classification-accuracy-over-long-recordings}{%
-\subsection{Goal 2: Assess classification accuracy over long recordings}\label{goal-2-assess-classification-accuracy-over-long-recordings}}
+\hypertarget{goal-2-assess-the-distal-accuracy-of-body-position-classification-models}{%
+\subsection{Goal 2: Assess the distal accuracy of body position classification models}\label{goal-2-assess-the-distal-accuracy-of-body-position-classification-models}}
 
 \begin{figure}
 
@@ -335,7 +337,7 @@ Kappa & Supine & 0.932 & 0.770 & 0.307 & 0.984 & 0.913 & 0.169\\
 
 }
 
-\caption{Overall agreement between human-coded body position and model-predicted body position in the long-delay period. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.}\label{fig:part2overall}
+\caption{Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.}\label{fig:part2overall}
 \end{figure}
 
 \begin{table}[tbp]
@@ -371,7 +373,7 @@ Overall & 0.80 & 0.91 & 0.95 & 0.96\\
 
 }
 
-\caption{Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the long delay period. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.}\label{fig:part2bins}
+\caption{Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.}\label{fig:part2bins}
 \end{figure}
 
 \begin{table}[tbp]
@@ -379,7 +381,7 @@ Overall & 0.80 & 0.91 & 0.95 & 0.96\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
+\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule
@@ -401,8 +403,8 @@ Overall & 0.80 & 0.94 & 0.93 & 0.94\\
 
 \end{table}
 
-\hypertarget{goal-3-examine-wear-time-and-compliance-in-full-day-data-collection}{%
-\subsection{Goal 3: Examine wear time and compliance in full-day data collection}\label{goal-3-examine-wear-time-and-compliance-in-full-day-data-collection}}
+\hypertarget{goal-3-examine-the-data-quality-of-full-day-home-recordings}{%
+\subsection{Goal 3: Examine the data quality of full-day home recordings}\label{goal-3-examine-the-data-quality-of-full-day-home-recordings}}
 
 \begin{figure}
 
@@ -413,8 +415,8 @@ Overall & 0.80 & 0.94 & 0.93 & 0.94\\
 \caption{Timelines}\label{fig:timelines}
 \end{figure}
 
-\hypertarget{goal-4-determine-sensitivity-of-classification-to-measure-age-differences-in-body-position}{%
-\subsection{Goal 4: Determine sensitivity of classification to measure age differences in body position}\label{goal-4-determine-sensitivity-of-classification-to-measure-age-differences-in-body-position}}
+\hypertarget{goal-4-assess-the-suitability-of-full-day-predictions-for-capturing-age-differences-in-body-position}{%
+\subsection{Goal 4: Assess the suitability of full-day predictions for capturing age differences in body position}\label{goal-4-assess-the-suitability-of-full-day-predictions-for-capturing-age-differences-in-body-position}}
 
 \begin{figure}
 
@@ -460,7 +462,40 @@ Held & 12.7\% (6.9) & 8.5\% (5.4) & 17.6\% (19.9) & 7.4\% (7.6)\\
 \section{References}\label{references}}
 
 \hypertarget{refs}{}
-\begin{CSLReferences}{0}{0}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-AdolphCTL2014}{}}%
+Adolph, K. E., \& Tamis-LeMonda, C. S. (2014). The costs and benefits of development: The transition from crawling to walking. \emph{Child Development Perspectives}, \emph{8}, 187--192. \url{https://doi.org/10.1111/cdep.12085}
+
+\leavevmode\vadjust pre{\hypertarget{ref-ChenSchneider2022}{}}%
+Chen, Q., Schneider, J. L., West, K. L., \& Iverson, J. M. (2022). Infant locomotion shapes proximity to adults during everyday play in the u.s. \emph{Infancy}. \url{https://doi.org/10.1111/infa.12503}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Survey}{}}%
+Franchak, J. M. (2019). Changing opportunities for learning in everyday life: Infant body position over the first year. \emph{Infancy}, \emph{24}, 187--209.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Freeplay}{}}%
+Franchak, J. M., Kretch, K. S., \& Adolph, K. E. (2018). See and be seen: Infant-caregiver social looking during locomotor free play. \emph{Developmental Science}, \emph{21}, e12626.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Karasik2011}{}}%
+Karasik, L. B., Tamis-LeMonda, C. S., \& Adolph, K. E. (2011). Transition from crawling to walking and infants' actions with objects and people. \emph{Child Development}, \emph{82}, 1199--1209. \url{https://doi.org/10.1111/j.1467-8624.2011.01595.x}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Karasik2014}{}}%
+Karasik, L. B., Tamis-LeMonda, C. S., \& Adolph, K. E. (2014). Crawling and walking infants elicit different verbal responses from mothers. \emph{Developmental Science}, \emph{17}, 388--395. \url{https://doi.org/10.1111/desc.12129}
+
+\leavevmode\vadjust pre{\hypertarget{ref-CWW}{}}%
+Kretch, K. S., Franchak, J. M., \& Adolph, K. E. (2014). Crawling and walking infants see the world differently. \emph{Child Development}, \emph{85}, 1503--1518. \url{https://doi.org/10.1111/cdev.12206}
+
+\leavevmode\vadjust pre{\hypertarget{ref-LuoFranchak2020}{}}%
+Luo, C., \& Franchak, J. M. (2020). Head and body structure infants' visual experiences during mobile, naturalistic play. \emph{{PLoS ONE}}, \emph{15}, e0242009.
+
+\leavevmode\vadjust pre{\hypertarget{ref-SoskaAdolph2014}{}}%
+Soska, K. C., \& Adolph, K. E. (2014). Postural position constrains multimodal object exploration in infants. \emph{Infancy}, \emph{19}, 138--161. \url{https://doi.org/10.1111/infa.12039}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Thurman2017}{}}%
+Thurman, S. L., \& Corbetta, D. (2017). Spatial exploration and changes in infant-mother dyads around transitions in infant locomotion. \emph{Developmental Psychology}, \emph{53}, 1207--1221.
+
+\leavevmode\vadjust pre{\hypertarget{ref-WestIverson2021}{}}%
+West, K. L., \& Iverson, J. M. (2021). Communication changes when infants begin to walk. \emph{Developmental Science}, \emph{24}(5). \url{https://doi.org/10.1111/desc.13102}
+
 \end{CSLReferences}
 
 

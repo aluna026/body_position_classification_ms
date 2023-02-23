@@ -33,7 +33,7 @@ Kappa & 0.769 & 0.757 & 0.160 & 0.846 & 0.820 & 0.141\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metricsbyclass}Model performance metrics for each body position class, shown separately for group and individual models.}
+\caption{\label{tab:metricsbyclass}Model performance metrics for each body position category, shown separately for group and individual models.}
 
 \begin{tabular}{llllllll}
 \toprule
@@ -108,7 +108,7 @@ Overall & 0.80 & 0.91 & 0.95 & 0.96\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
+\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule
