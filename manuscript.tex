@@ -208,22 +208,22 @@ Abstract
 
 Infants' movements facilitate and constrain how they interact with their surroundings from moment to moment. Changes in \emph{body position}---whether infants are supine on their backs, prone on their bellies, sitting, upright, or held by a caregiver---have immediate consequences for vision, object exploration, and social interaction. When sitting and upright, infants have a better view of faces and distant objects compared to their view while in a prone position (Franchak et al., 2018; Kretch et al., 2014; Luo \& Franchak, 2020). Infants struggle to manipulate objects while supine and prone, but sitting affords object exploration (Soska \& Adolph, 2014). Upright walking changes how infants and caregivers interact compared with crawling in a prone position; while walking infants move farther away, share toys in different ways, and hear different language from caregivers (Chen et al., 2022; Karasik et al., 2011, 2014; West \& Iverson, 2021). As infants grow older and acquire new abilities, such as independent sitting and walking, the spend more time sitting and upright and less time held, supine, and prone (Adolph \& Tamis-LeMonda, 2014; Franchak et al., 2018; Franchak, 2019; Thurman \& Corbetta, 2017). Thus, characterizing individual differences in the day-to-day accumulation of body position experiences informs developmental theory by revealing differential opportunities for learning.
 
-In this paper, we present an inertial sensing method to classify infant body position from moment-to-moment across an entire day, and validate its accuracy using XX hours of video recorded across XX in-home data collection sessions. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences using wearable audio recorders such as the LENA device. We begin by describing the impact of long-form audio recordings on research in developmental psychology, and identify the key features that should be replicated in long-form recordings of motor behavior. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief sessions {[}CITES{]}, the current investigation takes a needed step forward by testing accuracy over long recordings.
+In this paper, we present an inertial sensing method to classify infant body position from moment-to-moment across an entire day, and validate its accuracy using XX hours of video recorded across XX in-home data collection sessions. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences using wearable audio recorders. We begin by describing the impact of long-form audio recordings on research in developmental psychology, and identify the key features that should be replicated in long-form recordings of motor behavior {[}CITES{]}. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief sessions {[}CITES{]}, the current investigation takes a needed step forward by testing accuracy over long recordings.
 
 \hypertarget{inspiration-from-long-form-audio-methods}{%
 \subsection{Inspiration from Long-Form Audio Methods}\label{inspiration-from-long-form-audio-methods}}
 
-Impactful findings (Hailey write this paragraph)
-- individual differences in experiences
-- distribution of experiences (burstiness)
-Full-day language recording synchronized with other data sources allows researchers to identify how vocal input and production interacts with other processes. Linking LENA® speech measurements to repeated, time-stamped text-message surveys about infant device use revealed that infants heard less caregiver speech during moments that they were restrained in devices such as swings, exersaucers, and car seats (Malachowski et al., 2023). A custom-built wearable ECG and audio recorder allowed Wass et al. (2022) to discover that infant arousal increases the likelihood of infant vocalization across the day. In both examples, the ability to record real-time, synchronized data is vital for making inferences about processes that happen on the timescale of minutes or even seconds within in an individual as opposed to comparisons of aggregated data between infants.
+The LENA® recorder is a commercial device that is worn by infants in a custom shirt pocket that has sufficient battery life and storage to record for an entire day. Closed-source LENA® algorithms analyze the audio recordings to provide counts of useful metrics, such as the number of words spoken by adults in the vicinity of the participant. Other long-form audio methods rely on custom-built recorders (Wass et al., 2022), apply alternative classification algorithms to LENA® data (Micheletti et al., 2022; Räsänen et al., 2020), or manually transcribe audio recorded by LENA® devices to improve accuracy or identify behaviors beyond the built-in categories (Bergelson, Casillas, et al., 2019; Mendoza \& Fausey, 2021).
 
-Key features
-- unobtrusive (Bergelson; CTL stuff)
-- mobile (no limits to where recording happens)
-- real time
-- long duration (capture entire day and heterogeniety in activities)
-- automatic classification with good-enough accuracy (scaling)
+Long-form audio recordings have had a transformational impact on language development by allowing researchers to characterize opportunities for learning in daily life. Measuring the amount of speech heard by infants in the home (Weisleder \& Fernald, 2013) or in a daycare setting (Perry et al., 2018) revealed individual differences input that predict later vocabulary. Full-day language recording synchronized with other data sources allows researchers to identify how vocal input and production interacts with other processes. Beyond individual differences in aggregated data, long-form recordings can be used to determine the temporal schedule of experiences. For example, infants' daily experiences hearing music are clustered in time, with ``bursty'' episodes of hearing music separated by relatively long periods during which music is absent (Mendoza \& Fausey, 2022). Synchronizing audio recordings with other data sources extends researchers' ability to characterize daily experiences. Linking LENA® speech measurements to repeated, time-stamped text-message surveys about infant device placement revealed that infants heard less caregiver speech during moments that they were restrained in devices such as swings, exersaucers, and car seats (Malachowski et al., 2023). A custom-built wearable ECG and audio recorder allowed Wass et al. (2022) to discover that infant arousal increases the likelihood of infant vocalization across the day.
+
+We identified five key features of long-form audio methods to replicate in analagous studies of motor behavior. First, wearable audio recorders are \emph{mobile}. Measurement is not limited to a particular room because the recording device travels with the participant. Data are stored on device, so participants do not need to be in range of a receiver. Second, wearable audio recording is \emph{unobtrusive}. Participants' reactivity to observation, such as from a video camera, may influence behavior. For example, caregivers spoke more frequently to infants during a video-recorded portion of a home recording compared with audio-only segments captured by a LENA® device (Bergelson, Amatuni, et al., 2019). Third and fourth, recordings capture \emph{real-time data} over a \emph{full day}. The ability to record real-time data is vital for making inferences about processes that happen on the timescale of minutes or even seconds within in an individual as opposed to comparisons of aggregated data between infants. Synchronizing real-time data to other data streams helps to reveal sources of variability within an individual. Full-day recordings are essential for capturing experiences across the heterogeniety of daily routines that moderate behavior (e.g., play, feeding, errands) {[}CITE{]}. Burstiness of behavior means that long recordings are needed to capture clusters of events amid long periods in which they may be absent (Barbaro \& Fausey, 2022; Warlaumont et al., 2021).
+
+\begin{itemize}
+\tightlist
+\item
+  automatic classification with good-enough accuracy (scaling)
+\end{itemize}
 
 \hypertarget{limitations-of-video-and-survey-methods}{%
 \subsection{Limitations of Video and Survey Methods}\label{limitations-of-video-and-survey-methods}}
@@ -499,6 +499,15 @@ Held & 12.7\% (6.9) & 8.5\% (5.4) & 17.6\% (19.9) & 7.4\% (7.6)\\
 \leavevmode\vadjust pre{\hypertarget{ref-AdolphCTL2014}{}}%
 Adolph, K. E., \& Tamis-LeMonda, C. S. (2014). The costs and benefits of development: The transition from crawling to walking. \emph{Child Development Perspectives}, \emph{8}, 187--192. \url{https://doi.org/10.1111/cdep.12085}
 
+\leavevmode\vadjust pre{\hypertarget{ref-BarbaroFausey2022}{}}%
+Barbaro, K. de, \& Fausey, C. M. (2022). Ten lessons about infants' everyday experiences. \emph{Current Directions in Psychological Science}, \emph{31}(1), 28--33. \url{https://doi.org/10.1177/09637214211059536}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Bergelson2019Input}{}}%
+Bergelson, E., Amatuni, A., Dailey, S., Koorathota, S., \& Tor, S. (2019). Day by day, hour by hour: Naturalistic language input to infants. \emph{Developmental Science}, \emph{22}, e12715.
+
+\leavevmode\vadjust pre{\hypertarget{ref-Bergelson2019Corpus}{}}%
+Bergelson, E., Casillas, M., Soderstrom, M., Seidl, A., Warlaumont, A. S., \& Amatuni, A. (2019). What do {N}orth {A}merican babies hear? {A} large-scale cross-corpus analysis. \emph{Developmental Science}, \emph{22}, e12724.
+
 \leavevmode\vadjust pre{\hypertarget{ref-ChenSchneider2022}{}}%
 Chen, Q., Schneider, J. L., West, K. L., \& Iverson, J. M. (2022). Infant locomotion shapes proximity to adults during everyday play in the u.s. \emph{Infancy}. \url{https://doi.org/10.1111/infa.12503}
 
@@ -523,14 +532,35 @@ Luo, C., \& Franchak, J. M. (2020). Head and body structure infants' visual expe
 \leavevmode\vadjust pre{\hypertarget{ref-MalachowskiSalo2023}{}}%
 Malachowski, L. G., Salo, V. C., Needham, A. W., \& Humphreys, K. L. (2023). Infant placement and language exposure in daily life. \emph{Infant and Child Development}. \url{https://doi.org/10.1002/icd.2405}
 
+\leavevmode\vadjust pre{\hypertarget{ref-MendozaFausey2021}{}}%
+Mendoza, J. K., \& Fausey, C. M. (2021). Everyday music in infancy. \emph{Developmental Science}, \emph{24}(6). \url{https://doi.org/10.1111/desc.13122}
+
+\leavevmode\vadjust pre{\hypertarget{ref-MendozaFausey2022}{}}%
+Mendoza, J. K., \& Fausey, C. M. (2022). Everyday parameters for episode-to-episode dynamics in the daily music of infancy. \emph{Cognitive Science}, \emph{46}(8). \url{https://doi.org/10.1111/cogs.13178}
+
+\leavevmode\vadjust pre{\hypertarget{ref-MichelettiYao2022}{}}%
+Micheletti, M., Yao, X., Johnson, M., \& Barbaro, K. de. (2022). Validating a model to detect infant crying from naturalistic audio. \emph{Behavior Research Methods}. \url{https://doi.org/10.3758/s13428-022-01961-x}
+
+\leavevmode\vadjust pre{\hypertarget{ref-PerryPrince2018}{}}%
+Perry, L. K., Prince, E. B., Valtierra, A. M., Rivero-Fernandez, C., Ullery, M. A., Katz, L. F., Laursen, B., \& Messinger, D. S. (2018). A year in words: The dynamics and consequences of language experiences in an intervention classroom. \emph{{PLOS} {ONE}}, \emph{13}(7), e0199893. \url{https://doi.org/10.1371/journal.pone.0199893}
+
+\leavevmode\vadjust pre{\hypertarget{ref-RasanenSeshadri2020}{}}%
+Räsänen, O., Seshadri, S., Lavechin, M., Cristia, A., \& Casillas, M. (2020). {ALICE}: An open-source tool for automatic measurement of phoneme, syllable, and word counts from child-centered daylong recordings. \emph{Behavior Research Methods}, \emph{53}(2), 818--835. \url{https://doi.org/10.3758/s13428-020-01460-x}
+
 \leavevmode\vadjust pre{\hypertarget{ref-SoskaAdolph2014}{}}%
 Soska, K. C., \& Adolph, K. E. (2014). Postural position constrains multimodal object exploration in infants. \emph{Infancy}, \emph{19}, 138--161. \url{https://doi.org/10.1111/infa.12039}
 
 \leavevmode\vadjust pre{\hypertarget{ref-Thurman2017}{}}%
 Thurman, S. L., \& Corbetta, D. (2017). Spatial exploration and changes in infant-mother dyads around transitions in infant locomotion. \emph{Developmental Psychology}, \emph{53}, 1207--1221.
 
+\leavevmode\vadjust pre{\hypertarget{ref-WarlaumontSobowale2021}{}}%
+Warlaumont, A. S., Sobowale, K., \& Fausey, C. M. (2021). Daylong mobile audio recordings reveal multitimescale dynamics in infants' vocal productions and auditory experiences. \emph{Current Directions in Psychological Science}, \emph{31}(1), 12--19. \url{https://doi.org/10.1177/09637214211058166}
+
 \leavevmode\vadjust pre{\hypertarget{ref-WassPhillips2022}{}}%
 Wass, S., Phillips, E., Smith, C., Fatimehin, E. O., \& Goupil, L. (2022). Vocal communication is tied to interpersonal arousal coupling in caregiver-infant dyads. \emph{{eLife}}, \emph{11}. \url{https://doi.org/10.7554/elife.77399}
+
+\leavevmode\vadjust pre{\hypertarget{ref-Weisleder2013}{}}%
+Weisleder, A., \& Fernald, A. (2013). Talking to children matters: Early language experience strengthens processing and builds vocabulary. \emph{Psychological Science}, \emph{24}, 2143--2152.
 
 \leavevmode\vadjust pre{\hypertarget{ref-WestIverson2021}{}}%
 West, K. L., \& Iverson, J. M. (2021). Communication changes when infants begin to walk. \emph{Developmental Science}, \emph{24}(5). \url{https://doi.org/10.1111/desc.13102}
