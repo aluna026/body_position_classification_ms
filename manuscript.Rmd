@@ -100,7 +100,9 @@ In contrast, survey methods such as daily diaries/inventories or ecological mome
 
 ## Promise of Inertial Sensing Methods
 
-Wear time is not an issue. Lots of Smith and other studies with long recordings.
+Measuring infant movement with inertial movement units (IMUs) is a promising avenue for long form recordings of motor behavior in the home. Lightweight sensors (XX-XXg) can be embedded in garments to make recordings fully *mobile*, and they are *unobtrusive* because they do not require a researcher's presence nor do they record sensitive audio/video that might influence participants' behavior. Many commerically-available and inexpensive IMUs have > 12 hour battery life an onboard storage to record *real-time*, *full-day* data of movements at a sampling rate that is higher than typical video (e.g., 50-100 Hz). Moreover, past work has successfully recorded the rate of leg kicks [SMITH CITE] and activity intensity [CITES] in infants and children across an entire day. 
+
+The open question is whether *automatic classification* is sufficiently accurate to measure movement categories that are relevant to developmental and clinical research, and whether measurement validity is acceptable over long recording periods. 
 
 Classification accuracy from ML is good. older papers; Airaksinen; Frontiers
 
