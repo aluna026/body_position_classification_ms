@@ -106,9 +106,9 @@ The open question is whether *automatic classification* is sufficiently accurate
 
 Categorizing body position---supine on the back, prone on the belly, sitting, upright, or held off the ground by a caregiver---is too complex for cut-point definitions to be accurate. First, the magnitude of movement can vary greatly *within* a body position. An upright infant can be standing still or can be walking briskly across the room. A prone infant and be stationary in "tummy time" or crawling in myriad ways [ADOLPH]. Moreover, the configuration of the arms, legs, and torso within a body position can vary greatly in everyday contexts. Infants can sit on the floor in a tripod position with support from an arm, in a "V" position with legs fully extended, in a "W" position with knees bent. Sitting on a caregivers' lap without the need to maintain balance means that the legs can dangle and the torso can lean in different directions. Sitting in a high chair or car seat reduces the magnitude of postural sway within sitting, and creates still more possibilities for how the arms and legs may move relative to the torso. Indeed, creating an all-encompassing set of rules for how to annotate sitting from video is no trivial task because of the various ways that sitting can occur in daily life. 
 
-Classification accuracy from ML is good. older papers; Airaksinen; Frontiers
+Thus, modern approaches to human activity recognition have used machine learning to classify activity categories based on features derived from IMU data in adults [CITEs], children [CITEs], and infants [CITEs]. Synchronized video with ground-truth human annotations creates training data for a machine learning algorithm, such as a random forest models, that can be later used to predict categories from future IMU data that was not annotated. Although in the current investigation we focus on classification of body position, this approach can be extended to categorize other aspects of movement, such as locomotion [CITE] and OTHER EXAMPLES? Our openly-shared dataset [CITE] contains synchronized video and IMU data, allowing researchers to annotate and train models for behaviors beyond body position. 
 
-What's missing
+REVIEW PAST WORK IN BODY POSITION CLASSIFICATION, END WITH WHAT IS MISSING.
 
 ## Goals of the Current Study
 
