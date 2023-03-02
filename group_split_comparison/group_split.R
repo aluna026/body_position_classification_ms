@@ -11,7 +11,8 @@ library(rstatix)
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
-ntree = 150
+ntree = 550
+mtry = 44
 not_all_na <- function(x) any(!is.na(x))
 
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
@@ -27,7 +28,7 @@ group_model <- function(temp_id, training, ntree = 50, bad_ids = NULL) {
     mutate(code = fct_drop(code)) %>% 
     select(-id)
   group <- randomForest(code ~ ., data = temp_group_training, 
-                        localImp = TRUE, proximity = FALSE, ntree = ntree)
+                        localImp = TRUE, proximity = FALSE, ntree = ntree, mtry = mtry)
 }
 
 split_model <- function(temp_id, training, ntree = 50) {
@@ -37,7 +38,7 @@ split_model <- function(temp_id, training, ntree = 50) {
     mutate(code = fct_drop(code)) %>% 
     select(-id)
   split <- randomForest(code ~ ., data = temp_split_training, 
-                        localImp = TRUE, proximity = FALSE, ntree = ntree)
+                        localImp = TRUE, proximity = FALSE, ntree = ntree, mtry = mtry)
 }
 
 ids <- unique(training$id)
