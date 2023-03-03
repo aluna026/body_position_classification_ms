@@ -74,7 +74,7 @@ theme_update(text = element_text(size = 14),
              legend.key = element_rect(fill = "white")) 
 
 # SUBMITTED DATA IS BASED ON THE FOLLOWING IDS
-#9908  9909  9910  9911 10201 10203 10204 10301 10401 10501 10601 10701 10702 10703 10704 10802 10901 11001 11002 11004 11102 11103 11104 11202 11501 11601 11901 12001 12002 12101 12302 12303 12501 12502 13001
+#9908  9909  9910  9911 10201 10203 10204 10301 10501 10601 10701 10702 10703 10704 10802 10901 11001 11002 11004 11102 11103 11104 11202 11501 11601 11901 12001 12002 12101 12302 12303 12501 12502 13001
 
 ```
 
@@ -120,7 +120,7 @@ Three prior investigations have used machine learning to categorize infant body 
 
 Accordingly, the overarching goal of the current study is to test the feasibility and validity of long-form body position recording in the home during unsupervised, everyday behavior. Supervised recordings from past work [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], whether in the home or in the lab, let researchers set up the situation to encourage or restrict certain behaviors. Usually, caregivers are asked to play with the infant. However, across a real day, non-play activities (e.g., eating lunch in a high chair) create challenging situations for applying automated classification of body position. Will models trained on video-recorded observations at the beginning of the day generalize to predict behavior at a later time? Assessing the validity of temporally *distal* periods is a crucial step to establish whether automatic classification can be used to measure body position across a day. 
 
-In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 23 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A *proximal comparison* period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The **first goal** of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes. 
+In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 22 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A *proximal comparison* period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The **first goal** of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes. 
 
 A second, *distal comparison* period followed the proximal comparison period and captured approximately 90 minutes of home behavior that was completely unsupervised. Caregivers and infants could (and did) do whatever they wished. Because this recording happened a considerable amount of time after the initial setup and instructions from the experimenter, accuracy could decline if caregivers or infants moved the garment or sensors. Moreover, increasing variation in everyday activities during the distal comparison creates a greater challenge for classification, testing whether machine learning models can generalize to novel test cases. Thus, the **second goal** of our study was to assess accuracy during the distal comparison. 
 
@@ -367,6 +367,16 @@ rm(overall_row)
 apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
           midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
 ```
+
+
+What can we learn about the two outliers? What do they tell us about how this will work in the future.
+
+One outlier (106-4) had significant confusion between sitting and supine. Both their proximal and distal performance was bad, but only for sitting and supine. Watching the videos showed that this participant spent a long period of time in a seating device that was reclined between supine and sitting. Also spent long time in mother's arms in a similar supine/sitting position that was hard to classify. 
+
+The other outlier (107-3) had good proximal accuracy but poor distal accuracy. Confusion between upright and suspended. Infant was in a baby walker for most of part 2. Moved more like a baby held by a CG than a baby walking upright. 
+
+For both, other class performance was good, suggesting that it's about the particular events, not about the quality of the algorithm in applying to the participant overall. 
+
 
 ## Goal 3: Examine the data quality of full-day home recordings
 
