@@ -15,6 +15,9 @@ ntree = 550
 mtry = 44
 not_all_na <- function(x) any(!is.na(x))
 
+total_time <- session %>% mutate(coded_time = end_time_coded - start_time_coded) %>% arrange(coded_time)
+total_samples <- slide_filt %>% drop_na(code) %>% group_by(id) %>% summarize(n_samples = n()) %>% arrange(n_samples)
+
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
 
