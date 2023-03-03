@@ -242,12 +242,14 @@ apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD"
 # PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
   filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
-         mutate(pos = factor(pos, levels = pos_levels))
+         mutate(pos = factor(pos, levels = pos_levels)) %>% 
+  filter(file != "104/1")
 pt2_split <- read_csv("data/compiled_agreement_split.csv") %>% 
   filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
-         mutate(pos = factor(pos, levels = pos_levels))
+         mutate(pos = factor(pos, levels = pos_levels)) %>% 
+  filter(file != "104/1")
 
-outlier_files <- c("107/3", "104/1", "106/1")
+outlier_files <- c("107/3", "106/1")
 filter_outliers <- . %>% filter(!(file %in% outlier_files))
 
 # Count up position totals and join into an agreement data frame
@@ -274,7 +276,7 @@ agreement_scatter <- function(ds) {
   geom_point(data = filter_outliers(ds), mapping = aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
   geom_abline(intercept = 0, slope = 1) + 
   scale_fill_manual(values = pal, guide = "none") + 
-  scale_shape_manual(guide = "none", values = 22:24) + 
+  scale_shape_manual(guide = "none", values = 22:23) + 
   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
   facet_wrap("pos", ncol = 2, as.table = F) +
@@ -336,7 +338,7 @@ difference_plot <- function(ds) {
   stat_summary(data = filter(ds, file %in% outlier_files), position = position_dodge(.4), aes(shape = file), fill = "#333333", size = .75, stroke = .25) +
   stat_summary(position = position_dodge(.4), shape = 21, size = .75, stroke = .25) +
   scale_fill_manual(values = pal, guide = "none") +
-  scale_shape_manual(guide = "none", values = 22:24) + 
+  scale_shape_manual(guide = "none", values = 22:23) + 
   coord_cartesian(ylim = c(-1, 1)) + xlab("") + 
   scale_y_continuous(name = "Prediction Difference (min)", breaks = seq(-1, 1, .2), labels = seq(-10, 10, 2), minor_breaks = waiver()) + 
     theme(axis.text.x = element_text(size = 13, color = "black"))
@@ -387,6 +389,7 @@ timeline_data <- read_csv("data/imu-compiled.csv") %>%
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
          nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
+  filter(id_uni != 10401) %>% 
   pivot_longer(cols = nap_time:upright_time, names_to = "position", values_to = "prop") %>% 
   mutate(Position = factor(position,
                            levels = c("nap_time","upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
@@ -424,11 +427,13 @@ timeline_plots[[1]] + timeline_plots[[2]]
 fullday_group <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
-         nap_time = ifelse(is.na(sit_time), nap_time, NA))
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
+  filter(id_uni != 10401)
 fullday_split <- read_csv("data/imu-compiled-split.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
-         nap_time = ifelse(is.na(sit_time), nap_time, NA))
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
+  filter(id_uni != 10401)
 fullday <- list("group" = fullday_group, "split" = fullday_split)
 
 fullday_long <- function(ds) {

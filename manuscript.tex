@@ -246,7 +246,7 @@ Three prior investigations have used machine learning to categorize infant body 
 
 Accordingly, the overarching goal of the current study is to test the feasibility and validity of long-form body position recording in the home during unsupervised, everyday behavior. Supervised recordings from past work (Airaksinen et al., 2022, 2020; Franchak et al., 2021), whether in the home or in the lab, let researchers set up the situation to encourage or restrict certain behaviors. Usually, caregivers are asked to play with the infant. However, across a real day, non-play activities (e.g., eating lunch in a high chair) create challenging situations for applying automated classification of body position. Will models trained on video-recorded observations at the beginning of the day generalize to predict behavior at a later time? Assessing the validity of temporally \emph{distal} periods is a crucial step to establish whether automatic classification can be used to measure body position across a day.
 
-In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 23 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A \emph{proximal comparison} period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The \textbf{first goal} of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes.
+In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 22 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A \emph{proximal comparison} period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The \textbf{first goal} of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes.
 
 A second, \emph{distal comparison} period followed the proximal comparison period and captured approximately 90 minutes of home behavior that was completely unsupervised. Caregivers and infants could (and did) do whatever they wished. Because this recording happened a considerable amount of time after the initial setup and instructions from the experimenter, accuracy could decline if caregivers or infants moved the garment or sensors. Moreover, increasing variation in everyday activities during the distal comparison creates a greater challenge for classification, testing whether machine learning models can generalize to novel test cases. Thus, the \textbf{second goal} of our study was to assess accuracy during the distal comparison.
 
@@ -394,12 +394,12 @@ Kappa & Supine & 0.934 & 0.762 & 0.311 & 0.989 & 0.921 & 0.158\\
 \cmidrule(r){2-3} \cmidrule(r){4-5}
 Position & Group & Individual & Group & Individual\\
 \midrule
-Held & 0.02 & 0.05 & 0.75 & 0.60\\
+Held & 0.02 & 0.04 & 0.73 & 0.60\\
 Prone & 0.97 & 0.86 & 0.97 & 0.84\\
-Sitting & 0.70 & 0.88 & 0.91 & 0.95\\
-Supine & 0.84 & 0.92 & 0.94 & 0.97\\
-Upright & 0.62 & 0.84 & 0.99 & 0.94\\ \midrule
-Overall & 0.76 & 0.87 & 0.95 & 0.96\\
+Sitting & 0.79 & 0.97 & 0.91 & 0.95\\
+Supine & 0.88 & 0.98 & 0.94 & 0.97\\
+Upright & 0.63 & 0.83 & 0.99 & 0.95\\ \midrule
+Overall & 0.80 & 0.91 & 0.95 & 0.96\\
 \bottomrule
 \end{tabular}
 
@@ -430,12 +430,12 @@ Overall & 0.76 & 0.87 & 0.95 & 0.96\\
 \cmidrule(r){2-3} \cmidrule(r){4-5}
 Position & Group & Individual & Group & Individual\\
 \midrule
-Held & 0.51 & 0.45 & 0.67 & 0.64\\
+Held & 0.51 & 0.46 & 0.67 & 0.63\\
 Prone & 0.96 & 0.90 & 0.96 & 0.89\\
-Sitting & 0.71 & 0.91 & 0.89 & 0.92\\
-Supine & 0.75 & 0.94 & 0.88 & 0.94\\
-Upright & 0.90 & 0.93 & 0.98 & 0.96\\ \midrule
-Overall & 0.79 & 0.93 & 0.92 & 0.94\\
+Sitting & 0.72 & 0.93 & 0.89 & 0.92\\
+Supine & 0.76 & 0.96 & 0.88 & 0.93\\
+Upright & 0.91 & 0.93 & 0.98 & 0.96\\ \midrule
+Overall & 0.80 & 0.94 & 0.92 & 0.94\\
 \bottomrule
 \end{tabular}
 
@@ -443,6 +443,14 @@ Overall & 0.79 & 0.93 & 0.92 & 0.94\\
 \end{center}
 
 \end{table}
+
+What can we learn about the two outliers? What do they tell us about how this will work in the future.
+
+One outlier (106-4) had significant confusion between sitting and supine. Both their proximal and distal performance was bad, but only for sitting and supine. Watching the videos showed that this participant spent a long period of time in a seating device that was reclined between supine and sitting. Also spent long time in mother's arms in a similar supine/sitting position that was hard to classify.
+
+The other outlier (107-3) had good proximal accuracy but poor distal accuracy. Confusion between upright and suspended. Infant was in a baby walker for most of part 2. Moved more like a baby held by a CG than a baby walking upright.
+
+For both, other class performance was good, suggesting that it's about the particular events, not about the quality of the algorithm in applying to the participant overall.
 
 \hypertarget{goal-3-examine-the-data-quality-of-full-day-home-recordings}{%
 \subsection{Goal 3: Examine the data quality of full-day home recordings}\label{goal-3-examine-the-data-quality-of-full-day-home-recordings}}
@@ -481,11 +489,11 @@ Overall & 0.79 & 0.93 & 0.92 & 0.94\\
 \cmidrule(r){2-3} \cmidrule(r){4-5}
 Position & Younger & Older & Younger & Older\\
 \midrule
-Upright & 7.6\% (8.9) & 18.6\% (7.4) & 9.9\% (13.1) & 18.7\% (8.4)\\
-Sitting & 26.3\% (12.1) & 44.4\% (10.1) & 20.2\% (16.3) & 46.9\% (13.3)\\
-Prone & 13.8\% (13.5) & 14.4\% (6.0) & 11.9\% (9.9) & 16.9\% (10.6)\\
-Supine & 37.9\% (23.2) & 14.0\% (8.4) & 39.4\% (30.3) & 10.0\% (9.5)\\
-Held & 12.7\% (6.9) & 8.5\% (5.4) & 17.6\% (19.9) & 7.4\% (7.6)\\
+Upright & 7.7\% (9.3) & 18.6\% (7.4) & 10.4\% (13.6) & 18.7\% (8.4)\\
+Sitting & 24.9\% (11.5) & 44.4\% (10.1) & 18.8\% (16.3) & 46.9\% (13.3)\\
+Prone & 14.4\% (13.8) & 14.4\% (6.0) & 12.5\% (10.2) & 16.9\% (10.6)\\
+Supine & 38.5\% (24.0) & 14.0\% (8.4) & 40.2\% (31.6) & 10.0\% (9.5)\\
+Held & 12.7\% (7.1) & 8.5\% (5.4) & 17.1\% (20.8) & 7.4\% (7.6)\\
 \bottomrule
 \end{tabular}
 
