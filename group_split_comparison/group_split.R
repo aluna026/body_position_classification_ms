@@ -46,7 +46,7 @@ group_mods <-map(ids, ~group_model(.x, training)) %>% set_names(ids)
 # group_select_mods <- map(ids, ~group_model(.x, training, bad_ids = bad_ids)) %>% set_names(ids)
 split_mods <- map(ids, ~split_model(.x, training)) %>% set_names(ids)
 
-# save(group_select_mods, split_mods, file = "group_split_comparison/models.RData")
+# save(group_mods, split_mods, file = "group_split_comparison/models.RData")
 # load( here("group_split_comparison","models.RData"))
 
 metrics <- function(rfmodel, testing) {

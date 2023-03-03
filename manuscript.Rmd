@@ -73,6 +73,9 @@ theme_update(text = element_text(size = 14),
              panel.grid.minor = element_blank(), axis.line = element_blank(), 
              legend.key = element_rect(fill = "white")) 
 
+# SUBMITTED DATA IS BASED ON THE FOLLOWING IDS
+#9908  9909  9910  9911 10201 10203 10204 10301 10401 10501 10601 10701 10702 10703 10704 10802 10901 11001 11002 11004 11102 11103 11104 11202 11501 11601 11901 12001 12002 12101 12302 12303 12501 12502 13001
+
 ```
 
 From moment to moment, infants' movements facilitate and constrain how they can interact with their surroundings. Changes in *body position*---whether infants are supine on their backs, prone on their bellies, sitting, upright, or held by a  caregiver---have immediate consequences for vision, object exploration, and social interaction. When sitting and upright, infants have a better view of faces and distant objects compared to their view while in a prone position [@Freeplay; @LuoFranchak2020; @CWW]. Infants struggle to manipulate objects while supine and prone, but sitting affords object exploration [@SoskaAdolph2014]. Upright walking changes how infants and caregivers interact compared with crawling in a prone position; while walking infants move farther away, share toys in different ways, and hear different language from caregivers [@ChenSchneider2022; @Karasik2011; @WestIverson2021; @Karasik2014]. As infants grow older and acquire new abilities, such as independent sitting and walking, the spend more time sitting and upright and less time held, supine, and prone [@Survey; @Thurman2017; @Freeplay; @AdolphCTL2014]. Thus, characterizing individual differences in the day-to-day accumulation of body position experiences informs developmental theory by revealing differential opportunities for learning [@CurrentOpinion].
