@@ -11,7 +11,7 @@ library(rstatix)
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
-ntree = 550
+ntree = 1100
 mtry = 44
 not_all_na <- function(x) any(!is.na(x))
 
