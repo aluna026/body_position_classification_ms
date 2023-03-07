@@ -47,7 +47,7 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-
+manuscript_files/
 group_split_comparison/compiled_data_lite.RData
 models.RData
 manuscript_files/figure-latex/age-1.pdf
