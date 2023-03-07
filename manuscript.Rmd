@@ -151,7 +151,7 @@ Most participants were tested in a single session (*n* = `r nrow(num_sessions %>
 
 Four inertial movement units (IMUs) were used to record infant movement across the day (MC10 Biostamp). A custom garment was made to hold the IMUs: Internal pockets were sewn into a snug-fitting pair of infant leggings so that IMUs would stay close to the body and so that infants could not pull out the sensors. On each side of the body there was a pocket over the hip and a pocket just above the ankle. Each sensor recorded accelerometer and gyroscope data at 62.5 Hz throughout the day, with sufficient battery and on-device storage to record for approximately 12 hours. Infants also wore a LENA&reg; recorder throughout the day in the front pocket of a LENA&reg; shirt, located near the infant’s chest. 
 
-Video recordings were captured using an action camera on a miniature tripod (Insta360 ONE R) that caregivers placed in the room that the infant was in. The proprietary "Boosted Battery Base" attached to the action camera to allow for a total of 3 hours of recording. However, as described below, this created two video files separated by a variable gap of approximately 40 s. Caregivers also received a log sheet to record times that infants napped as well as times that the sensor garment was removed from the infant (e.g., baths, diaper changes).
+Video recordings were captured using an action camera on a miniature tripod (Insta360 ONE R) that caregivers placed in the room that the infant was in. The proprietary "Boosted Battery Base" attached to the action camera to allow for a total of 3 hours of recording. However, as described below, this created two video files separated by a variable gap of approximately 40 s. Caregivers also received a log sheet to record times that infants napped as well as times that the sensor garment was removed from the infant (e.g., baths, diaper changes). 
 
 ## Procedure
 
@@ -165,7 +165,24 @@ knitr::include_graphics("figures/timeline.png")
 # > session_param$start_time_coded = "2022-11-13 10:02:40 PST"
 ```
 
-## Body position annotation
+On the day of the visit, a researcher arrived at the participant’s home in the morning between and prepared all the equipment at the doorstep. In order to synchronize all three recording devices, the researcher began by first turning on the video camera and the LENA audio device (the IMUs were already configured and placed at arrival because they required a proprietary sensor dock to begin recording in the laboratory). To create an easily recognizable synchronization point between the video recording and IMU data, the researcher dropped or slammed the leggings (containing the IMUs) on a surface in view of the camera, as in [@FranchakScott2021]. All the equipment---now recording and synchronized---was placed inside a large bucket and left outside the family's front door. 
+
+Returning to their vehicle, the researcher then called the caregiver and walked them through all of the paperwork, having them sign in the designated areas. The caregiver was then instructed to place the camera in an area that captured the majority of the room. They then were asked to put the pair of leggings and shirt on their infant. 
+
+The researcher then had the caregiver complete a number of guided activities with their infant. Within view of the camera the caregiver was asked to place their infant in several different positions. These positions were as follows: lying supine, lying prone, sitting on the floor, standing upright, held by the caregiver while they walked back and forth, crawling or walking independently, and sitting restrained. The positions were assisted or unassisted and were timed by the researcher. Except for lying supine and held by a caregiver which lasted for a duration of 3-4 minutes, all other positions lasted for 1 minute.The caregiver was then instructed to remove the leggings from the child, raise it above their head and drop it to the floor standing approximately six feet away from the camera in order to capture another identifiable synchronization point. Once completed, the caregiver was then instructed to play with their infant for 10 minutes within view of the camera. Afterwards they were to go about their day as usual. The sensors were to be worn up until the child’s bedtime. The caregiver logged the times the sensors had to be removed or the child took a nap.
+
+The Camera (Insta360) only had the battery life to record for ~three hours. Afterwards, the participant was instructed at the 3.5 hour mark to put the camera back in the bucket. 
+
+The following day a researcher picked up the equipment, verified the paperwork was signed, and compensated the participant.
+
+## Body Position Annotation
+
+The insta360 recordings were used by trained human coders to identify infant body position: supine, prone, sitting, sitting restrained, upright, or held. All coding was done using Datavyu software. 
+
+When the infant was lying on their back or was reclined 45 degrees or more, supine was coded. Supine was also coded when the infant was laying on their side. Prone was coded when the infant was lying on their stomach, was on all fours in a downward dog position, or was crawling. When an infant was sitting with their butt on a surface, such as on the floor or a caregiver’s lap, the time frame was coded sitting on a surface by researchers. Sitting was also coded when the infant was in a kneeling-sit position, in which their knees were on the ground with their legging tucked underneath. When an infant was in a seating device that restricted movement, such as a high chair, sitting restrained was coded. Upright was coded when the infant was standing on the ground with two feet, walking, or kneeling with their thighs and torso in a straight line. When an infant was carried by a caregiver, held was coded. However, when the caregiver was sitting with the infant in their lap the infant’s body position was coded as if the caregiver was a surface (e.g., if the infant was sitting on the caregiver’s lap this was coded as sitting). The positions that did not fit in one of the six categories or when the infant was out of view were excluded. Periods when the leggings were being adjusted or taken off the infant were also excluded. 
+
+Primary coding was completed for the full length of the video, while reliability coding was completed for the first thirty minutes. Interrater reliability between coders … (overall agreement = XX.X%, kappa = X.XX). 
+
 
 ## Body position classification
 
