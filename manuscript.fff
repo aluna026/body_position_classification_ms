@@ -6,7 +6,7 @@
 
 }
 
-\caption{Example Timeline Caption.}\label{fig:exemplartimeline}
+\caption{Example Timeline Caption.}\label{fig:exemplar-timeline}
 \end{figure*}
 \begin{figure*}[hbt]
 \ifnextchar[{\eatarg}{}
