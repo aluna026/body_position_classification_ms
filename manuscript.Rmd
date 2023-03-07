@@ -130,7 +130,7 @@ After this second video recording period, we asked caregivers to keep infants we
 
 ## Participants and Design
 
-```{r participants}
+```{r participants, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 ppts <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")))
@@ -198,7 +198,7 @@ A primary coder completed annotation for the full length of the video, while an 
 
 <!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
 
-```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=5, fig.height=8}
+```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=5, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
 metrics <- read_csv("data/group_split_metrics.csv") %>% 
   filter(model %in% c("group", "split")) %>% 
   mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
@@ -225,7 +225,7 @@ metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., 
 
 ```
 
-```{r metricstable}
+```{r metricstable, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
 
 metrics_long %>% group_by(Model, metric) %>% 
   get_summary_stats(value) %>% 
@@ -243,7 +243,7 @@ metrics_long %>% group_by(Model, metric) %>%
 
 \renewcommand{\arraystretch}{.75}
 
-```{r metricsbyclass}
+```{r metricsbyclass, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics_class.csv")}
 metrics_class <- read_csv("data/group_split_metrics_class.csv") %>% 
   filter(model %in% c("group", "split")) %>% 
   mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
@@ -277,7 +277,7 @@ apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD"
 
 <!-- compiled_agreement, generated from analysis-part2 -->
 
-```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=7, fig.height=6.5}
+```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=7, fig.height=6.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 
 # PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
@@ -330,7 +330,7 @@ agree_plots <- map2(agree_plots, c("A. Group Models", "B. Individual Models"), ~
 agree_plots[[1]] + agree_plots[[2]]
 ```
 
-```{r, pt2overalltable}
+```{r, pt2overalltable, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 #By posture
 pt2corr_with_outliers <- map_dfc(agree, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
 pt2corr_without_outliers <- map_dfc(agree, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
@@ -352,7 +352,7 @@ apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "In
           midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
 ```
 
-```{r part2bins, warning=FALSE, fig.cap="Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5}
+```{r part2bins, warning=FALSE, fig.cap="Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 calculate_agreement_bins <- function(ds) {
   ds <- ds %>% group_by(file) %>% 
     mutate(sample = row_number(), bin = floor(sample/300)) %>% 
@@ -388,7 +388,7 @@ difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual M
 difference_plots[[1]] + difference_plots[[2]]
 ```
 
-```{r pt2binstable}
+```{r pt2binstable, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 #Bins
 pt2corr_with_outliers <- map_dfc(agree_bins, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
 pt2corr_without_outliers <- map_dfc(agree_bins, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
@@ -424,7 +424,7 @@ For both, other class performance was good, suggesting that it's about the parti
 
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
-```{r timelines, warning=FALSE, fig.cap="Timelines", fig.align="center", fig.width=7.75, fig.height=8}
+```{r timelines, warning=FALSE, fig.cap="Timelines", fig.align="center", fig.width=7.75, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 timeline_data <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
@@ -463,7 +463,7 @@ timeline_plots[[1]] + timeline_plots[[2]]
 
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
-```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7}
+```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 fullday_group <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
@@ -509,7 +509,7 @@ age_plots[[1]] + age_plots[[2]]
 
 ```
 
-```{r agetable}
+```{r agetable, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 pos_sum_age <- map(fullday, fullday_long) %>% 
   map(~ group_by(.x, group, position, id_uni) %>% 
             mutate(prop = prop * 100) %>% 
