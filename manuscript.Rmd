@@ -179,14 +179,18 @@ Because the camera only had the battery life to record for ~3 hours (divided int
 
 ## Body Position Annotation
 
-The proximal and distal comparison videos for each participant were annotated by trained human coders to identify infant body position: supine, prone, sitting, sitting restrained, upright, or held. All coding was done using Datavyu software (datavyu.org). 
+The proximal and distal comparison videos for each participant were annotated by trained human coders to identify infant *body position* into one of 5 mutually-exclusive categories: supine, prone, sitting, upright, or held by caregiver. All coding was done using Datavyu software (datavyu.org). 
 
-When the infant was lying on their back or was reclined 45 degrees or more, supine was coded. Supine was also coded when the infant was laying on their side. Prone was coded when the infant was lying on their stomach, was on all fours in a downward dog position, or was crawling. When an infant was sitting with their butt on a surface, such as on the floor or a caregiver’s lap, the time frame was coded sitting on a surface by researchers. Sitting was also coded when the infant was in a kneeling-sit position, in which their knees were on the ground with their legging tucked underneath. When an infant was in a seating device that restricted movement, such as a high chair, sitting restrained was coded. Upright was coded when the infant was standing on the ground with two feet, walking, or kneeling with their thighs and torso in a straight line. When an infant was carried by a caregiver, held was coded. However, when the caregiver was sitting with the infant in their lap the infant’s body position was coded as if the caregiver was a surface (e.g., if the infant was sitting on the caregiver’s lap this was coded as sitting). The positions that did not fit in one of the six categories or when the infant was out of view were excluded. Periods when the leggings were being adjusted or taken off the infant were also excluded. 
+Supine was coded when the infant was lying on their back or was reclined up to a 45 degrees angle. Supine was also coded in the rare cases when the infant was laying on their side. Prone was coded when the infant was lying on their stomach, was on all fours in a downward dog position, or was crawling. We scored sitting to include any form of the following seated positions: 1) infants sat with their buttocks on a surface, such as on the floor or a caregiver’s lap, 2) infant was in a kneeling-sit position, in which their knees were on the ground with their legs tucked underneath the buttocks, and 3) infant was in a seating device, such as a high chair, that kept the torso oriented perpendicular to the ground (a reclined position, such as in a young infant's car seat, would be counted as supine). Upright was coded when the infant was standing on the ground with two feet or walking (regardless of whether infants' balance was assisted by a caregiver or with their hands holding onto something for support). When an infant was carried by a caregiver, held was coded. However, when the caregiver was sitting with the infant in their lap the infant’s body position was coded as if the caregiver was a surface (e.g., if the infant was sitting on the caregiver’s lap this was coded as sitting). Times during the video when the infant was out of view were excluded. Periods when the leggings were being adjusted or taken off the infant were also excluded, as were transitions between body positions. 
 
-Primary coding was completed for the full length of the video, while reliability coding was completed for the first thirty minutes. Interrater reliability between coders … (overall agreement = XX.X%, kappa = X.XX). 
+A primary coder completed annotation for the full length of the video, while an independent reliability coder completed annotation for the first thirty minutes of each video. Interrater reliability was based on the proportion of video frames that the two coders chose the same body position code. Overall agreement averaged XX.X% across video files, ranging from XX-XX. Cohen's *kappa* ranged from XX-XX across files, with a mean of XX.  
 
 
 ## Body position classification
+
+## Data Sharing and Transparency
+
+<!-- WHAT CAN WE SHARE AND HOW -->
 
 # Results
 
