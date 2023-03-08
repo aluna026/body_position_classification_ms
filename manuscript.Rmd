@@ -52,6 +52,7 @@ library(scales)
 library(ggforce)
 library(hms)
 library(tidyverse)
+library(lubridate)
 library(rstatix)
 ```
 
@@ -81,7 +82,8 @@ theme_update(text = element_text(size = 14),
 From moment to moment, infants' movements facilitate and constrain how they can interact with their surroundings. Changes in *body position*---whether infants are supine on their backs, prone on their bellies, sitting, upright, or held by a  caregiver---have immediate consequences for vision, object exploration, and social interaction. When sitting and upright, infants have a better view of faces and distant objects compared to their view while in a prone position [@Freeplay; @LuoFranchak2020; @CWW]. Infants struggle to manipulate objects while supine and prone, but sitting affords object exploration [@SoskaAdolph2014]. Upright walking changes how infants and caregivers interact compared with crawling in a prone position; while walking infants move farther away, share toys in different ways, and hear different language from caregivers [@ChenSchneider2022; @Karasik2011; @WestIverson2021; @Karasik2014]. As infants grow older and acquire new abilities, such as independent sitting and walking, the spend more time sitting and upright and less time held, supine, and prone [@Survey; @Thurman2017; @Freeplay; @AdolphCTL2014]. Thus, characterizing individual differences in the day-to-day accumulation of body position experiences informs developmental theory by revealing differential opportunities for learning [@CurrentOpinion].
 <!-- Other west cites; cite new EMA; KretchKoziol2022 -->
 
-In this paper, we present an inertial sensing method to classify infant body position from moment-to-moment across an entire day, and validate its accuracy using over 100 hours of video recorded across 35 in-home data collection sessions. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences using wearable audio recorders. We begin by describing the impact of long-form audio recordings on research in developmental psychology, and identify the key features that should be replicated in long-form recordings of motor behavior. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief, supervised sessions [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], the current investigation takes a needed step forward by testing accuracy over long, unsupervised recordings. Although in the current investigation we focus on classification of body position, this approach can be extended to categorize other aspects of movement, such as locomotion [@AiraksinenRasanen2020] and infant-caregiver contact [@YaoPlotz2019]. Accompanying our paper, we have created a database [CITE] containing synchronized video and IMU data, allowing researchers to annotate and train models for behaviors beyond body position. 
+In this paper, we present an inertial sensing method to classify infant body position from moment-to-moment across an entire day, and validate its accuracy using over 100 hours of video recorded across 35 in-home data collection sessions. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences using wearable audio recorders. We begin by describing the impact of long-form audio recordings on research in developmental psychology, and identify the key features that should be replicated in long-form recordings of motor behavior. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief, supervised sessions [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], the current investigation takes a needed step forward by testing accuracy over long, unsupervised recordings. Although in the current investigation we focus on classification of body position, this approach can be extended to categorize other aspects of movement, such as locomotion [@AiraksinenRasanen2020] and infant-caregiver contact [@YaoPlotz2019]. 
+<!-- Accompanying our paper, we have created a database [CITE] containing synchronized video and IMU data, allowing researchers to annotate and train models for behaviors beyond body position.  -->
 
 ## Inspiration from Long-Form Audio Methods
 
@@ -120,7 +122,7 @@ Three prior investigations have used machine learning to categorize infant body 
 
 Accordingly, the overarching goal of the current study is to test the feasibility and validity of long-form body position recording in the home during unsupervised, everyday behavior. Supervised recordings from past work [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], whether in the home or in the lab, let researchers set up the situation to encourage or restrict certain behaviors. Usually, caregivers are asked to play with the infant. However, across a real day, non-play activities (e.g., eating lunch in a high chair) create challenging situations for applying automated classification of body position. Will models trained on video-recorded observations at the beginning of the day generalize to predict behavior at a later time? Assessing the validity of temporally *distal* periods is a crucial step to establish whether automatic classification can be used to measure body position across a day. 
 
-In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 22 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A *proximal comparison* period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The **first goal** of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes. 
+In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 35 testing sessions from 22 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each hip) and a video camera to collect ground truth data about infant body position. A *proximal comparison* period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. Although not directly supervised, this period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The **first goal** of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes. Past work found varying better performance using "individual models"---models that were trained on one participant's data to predict their later behavior---compared with a "group model" that aggregated data from all infants to create a single body position classifier [@FranchakScott2021], so we compared both modeling approaches in the current investigation.
 
 A second, *distal comparison* period followed the proximal comparison period and captured approximately 90 minutes of home behavior that was completely unsupervised. Caregivers and infants could (and did) do whatever they wished. Because this recording happened a considerable amount of time after the initial setup and instructions from the experimenter, accuracy could decline if caregivers or infants moved the garment or sensors. Moreover, increasing variation in everyday activities during the distal comparison creates a greater challenge for classification, testing whether machine learning models can generalize to novel test cases. Thus, the **second goal** of our study was to assess accuracy during the distal comparison. 
 
@@ -151,7 +153,7 @@ Most participants were tested in a single session (*n* = `r nrow(num_sessions %>
 
 Four inertial movement units (IMUs) were used to record infant movement across the day (MC10 Biostamp). A custom garment was made to hold the IMUs: Internal pockets were sewn into a snug-fitting pair of infant leggings so that IMUs would stay close to the body and so that infants could not pull out the sensors. On each side of the body there was a pocket over the hip and a pocket just above the ankle. Each sensor recorded accelerometer and gyroscope data at 62.5 Hz throughout the day, with sufficient battery and on-device storage to record for approximately 12 hours. Infants also wore a LENA&reg; recorder throughout the day in the front pocket of a LENA&reg; shirt, located near the infant’s chest. 
 
-Video recordings were captured using an action camera on a miniature tripod (Insta360 ONE R) that caregivers placed in the room that the infant was in. The proprietary "Boosted Battery Base" attached to the action camera to allow for a total of 3 hours of recording. However, as described below, this created two video files separated by a variable gap of approximately 40 s. Caregivers also received a log sheet to record times that infants napped as well as times that the sensor garment was removed from the infant (e.g., baths, diaper changes). 
+Video recordings were captured using an action camera on a miniature tripod (Insta360 ONE R) that caregivers placed in the room that the infant was in. The proprietary "Boosted Battery Base" attached to the action camera to allow for a total of 3 hours of recording. However, as described below, this created two video files temporally separated by a gap of approximately 40-45 s. Caregivers also received a log sheet to record times that infants napped as well as times that the sensor garment was removed from the infant (e.g., baths, diaper changes). 
 
 ## Procedure
 
@@ -165,7 +167,6 @@ knitr::include_graphics("figures/timeline.png")
 # > session_param$start_time_coded = "2022-11-13 10:02:40 PST"
 ```
 
-<!-- AVERAGE START TIME -->
 Figure \@ref(fig:exemplar-timeline)) shows an exemplar timeline of the entire procedure and recording periods for a single participant. On the day of the visit, a researcher arrived at the participant’s home in the morning between and prepared all the equipment at the doorstep. In order to synchronize all three recording devices, the researcher began by first turning on the video camera and the LENA audio device (the IMUs were already configured and placed at arrival because they required a proprietary sensor dock to begin recording in the laboratory). To create an easily recognizable synchronization point between the video recording and IMU data, the researcher dropped or struck the leggings (containing the IMUs) on a surface in view of the camera, as in @FranchakScott2021. All the equipment---once recording and with synchronization information recorded---was placed inside a large bucket and left outside the family's front door. 
 
 The researcher then called the caregiver on the phone and walked them through a set of procedures needed to properly set up the equipment and record video for classifier training and testing. At the start of this "guided call", the caregiver was instructed to place the camera in an area that captured the majority of the room. Next, they were asked to put the pair of leggings and shirt on their infant, with the researcher providing guidance about how to correctly orient the garments. 
@@ -200,7 +201,15 @@ Windowed datasets were used for machine learning classification and validation. 
 
 # Results
 
-## Goal 1: Assess the proximal accuracy of body position classification models
+```{r total-duration}
+duration <- ppts %>% group_by(id_uni) %>% 
+  summarize(start_time = min(clock_time_start), end_time= max(clock_time_end)) %>% 
+  mutate(duration = as.duration(end_time - start_time), duration_hours = as.numeric(duration, "hours")) %>% arrange(duration)
+```
+
+We report four sets of results based on `r length(unique(ppts$id_uni))` full-day testing sessions resulting in a total of `r sum(duration$duration_hours)` hours of movement recording. 
+
+## Assess the Proximal Accuracy of Body Position Classification Models
 
 <!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
 
@@ -464,6 +473,12 @@ timeline_plots <- map(c("Younger", "Older"), ~ timelines(filter(timeline_data, g
 timeline_plots <- map2(timeline_plots, c("A. 4-7 Months", "B. 11-14 Months"), ~ .x + ggtitle(.y))
 timeline_plots[[1]] + timeline_plots[[2]]
 ```
+
+```{r start-time}
+start_times <- ppts %>% group_by(id_uni) %>% slice_min(clock_time_start) %>% pull(clock_time_start) %>% sort
+start_times <- str_sub(as.character(start_times), start = 1, end = -4)
+```
+The start time ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, 
 
 ## Goal 4: Assess the suitability of full-day predictions for capturing age differences in body position
 
