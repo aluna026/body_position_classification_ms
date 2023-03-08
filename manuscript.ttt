@@ -5,7 +5,7 @@
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metricstable}Summary statistics for model performance metrics shown separately for group and individual models.}
+\caption{\label{tab:metrics-table}Summary statistics for model performance metrics shown separately for group and individual models.}
 
 \begin{tabular}{lllllll}
 \toprule
@@ -33,7 +33,7 @@ Kappa & 0.768 & 0.746 & 0.161 & 0.849 & 0.821 & 0.143\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metricsbyclass}Model performance metrics for each body position category, shown separately for group and individual models.}
+\caption{\label{tab:metrics-by-class}Model performance metrics for each body position category, shown separately for group and individual models.}
 
 \begin{tabular}{llllllll}
 \toprule
