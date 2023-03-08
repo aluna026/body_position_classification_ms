@@ -249,7 +249,7 @@ metrics_summary <- metrics_long %>% group_by(Model, metric) %>%
   get_summary_stats(value) %>% 
   select(-(variable:max), -(q1:mad), -se, -ci) %>% 
   pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
-  filter(metric != "Neg Pred Value", metric != "Specificity") %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity", metric != "Balanced Accuracy", metric != "F1") %>% 
   relocate(mean_Group, .after = median_Group) %>% 
   relocate(sd_Group, .after = mean_Group) %>% 
   mutate(across(-metric, ~ apa_num(.x, digits = 3)),
@@ -281,7 +281,7 @@ metrics_long_summary <- metrics_long_class %>% group_by(Class,Model, metric) %>%
   get_summary_stats(value) %>% 
   select(-(variable:max), -(q1:mad), -se, -ci) %>% 
   pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
-  filter(metric != "Neg Pred Value", metric != "Specificity") %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity", metric != "Balanced Accuracy", metric != "F1") %>% 
   relocate(mean_Group, .after = median_Group) %>% 
   relocate(sd_Group, .after = mean_Group) %>% 
   mutate(across(-(Class:metric), ~ apa_num(.x, digits = 3)),
@@ -294,15 +294,25 @@ class_table <- metrics_long_summary %>% mutate(metric = as.character(metric))
 class_table$metric[duplicated(class_table$metric)] <- " "
 
 apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD", "Median", "Mean", "SD"), col_spanners = list("Group" = c(3, 5), "Individual" = c(6, 8)),
-          midrules = c(5, 10, 15, 20),
+          midrules = c(5, 10),
           caption = "Model performance metrics for each body position category, shown separately for group and individual models.")
+metrics_long_summary <- metrics_long_summary %>% 
+  mutate(rowname = paste(Class, metric)) %>% 
+  column_to_rownames("rowname")
 ```
 
 The first set of analyses use data from the proximal comparison, in which video annotations and motion data were tightly synchronized (within 30-60 ms). This high degree of synchronization makes it possible to link human-coded body position annotations to each 4-s window of motion data, providing ground truth data for model training and testing. As in past work [@FranchakScott2021], we compared two types of models. To assess the accuracy of body position classification for each recording session, we held back the last 25% of a session's proximal comparison data as the testing set. The testing set was never used as training data. A *group model* was trained for each session using an aggregated dataset containing the first 75% of all **other** sessions' proximal comparison data. This leave-one-out cross-validation tested the generalization of the model to a recording session that was not used at all in training. In contrast, *individual models* were trained using the first 75% of a recording session, then tested against the last 25%. The individual model tests whether earlier training data generalize to later testing data within an individual participant's recording. In both cases, the testing set was the same, allowing for direct comparison between the two modeling approaches. 
 
+### Overall Accuracy 
+
 Figure \@ref(fig:metrics) and Table \@ref(tab:metrics-table) summarize the performance of group and individual models using standard metrics for classification. Overall accuracy (Figure \@ref(fig:metrics)A) represents the proportion of 4-s windows in the testing set in which the model prediction matched the human annotation of body position. Median overall accuracy was `r metrics_lookup["Overall Accuracy", "median_Group"]` for group models and `r metrics_lookup["Overall Accuracy", "median_Individual"]` for individual models. Although individual model accuracy was greater than group model accuracy, group model accuracy approached the level of agreement found between two human coders (median = .92) indicating that group models could adequately replace human coders. Still, it is notable that the worst-case accuracy from group models (minimum = `r metrics_lookup["Overall Accuracy", "min_Group"]`) was considerably lower than in individual models (minimum = `r metrics_lookup["Overall Accuracy", "min_Individual"]`). Possibly, individual models accounted for idiosyncrasies in behavior or inconsistencies in sensor placement for those sessions that group models could not generalize to.
 
-Strong overall accuracy can be misleading when class prevalence is unbalanced. For example, most infants spent longer sitting than prone, so good performance for sitting classification could mask poorer performance in prone classification. Accordingly, we report Cohen's kappa, a commonly-used metric that penalizes missing rare events (Figure \@ref(fig:metrics)), and provide classification metrics for each individual body position (Table \@ref(tab:metrics-by-class)) to account for imbalance in body position rates within and between individuals. Similar to overall accuracy, kappa values were strong for both model types with median group kappas (`r metrics_lookup["Kappa", "median_Group"]`) somewhat worse compared with median individual kappas (`r metrics_lookup["Kappa", "median_Individual"]`). Guidelines for interpreting kappa statistics [@LandisKoch1977] consider 0.81–1.00 "Almost Perfect,” 0.61–0.80 “Substantial,” 0.41–0.60 “Moderate,” 0.21– 0.40 “Fair,” and 0–0.20 “Slight to Poor”, indicating that agreement for most group and individual model predictions fell in the Substantial to Almost Perfect range.
+### Cohen's Kappa 
+Strong overall accuracy can be misleading when class prevalence is unbalanced. For example, most infants spent longer sitting than prone, so good performance for sitting classification could mask poorer performance in prone classification. Accordingly, we report Cohen's kappa, a commonly-used metric that penalizes missing rare events (Figure \@ref(fig:metrics)B), and provide classification metrics for each individual body position (Table \@ref(tab:metrics-by-class)) to account for imbalance in body position rates within and between individuals. Similar to overall accuracy, kappa values were strong for both model types with median group kappas (`r metrics_lookup["Kappa", "median_Group"]`) somewhat worse compared with median individual kappas (`r metrics_lookup["Kappa", "median_Individual"]`). Guidelines for interpreting kappa statistics [@LandisKoch1977] consider 0.81–1.00 "Almost Perfect,” 0.61–0.80 “Substantial,” 0.41–0.60 “Moderate,” 0.21– 0.40 “Fair,” and 0–0.20 “Slight to Poor”, indicating that agreement for most group and individual model predictions fell in the Substantial to Almost Perfect range. 
+
+As in past work, all body positions were accurately classified even though performance varied somewhat between positions. As Table \@ref(tab:metrics-by-class) shows, median kappa statistics were strongest for prone (group = `r metrics_long_summary["Prone Kappa", "median_Group"]`, individual = `r metrics_long_summary["Prone Kappa", "median_Individual"]`) and supine (group = `r metrics_long_summary["Supine Kappa", "median_Group"]`, individual = `r metrics_long_summary["Supine Kappa", "median_Individual"]`). Sitting performance fell in the middle, and was considerably worse for group models than individual models (group = `r metrics_long_summary["Sitting Kappa", "median_Group"]`, individual = `r metrics_long_summary["Sitting Kappa", "median_Individual"]`). Held (group = `r metrics_long_summary["Held Kappa", "median_Group"]`, individual = `r metrics_long_summary["Held Kappa", "median_Individual"]`) and upright (group = `r metrics_long_summary["Upright Kappa", "median_Group"]`, individual = `r metrics_long_summary["Upright Kappa", "median_Individual"]`) performance was the least accurate, however, median performance was still within the "Substantial" range. 
+
+### Sensitivity and Positive Predictive Value
 
 ## Goal 2: Assess the distal accuracy of body position classification models
 
