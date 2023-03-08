@@ -213,7 +213,7 @@ We report four sets of results based on `r length(unique(ppts$id_uni))` full-day
 
 <!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
 
-```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=5, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=5.5, fig.height=5.5, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
 metrics <- read_csv("data/group_split_metrics.csv") %>% 
   filter(model %in% c("group", "split")) %>% 
   mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
@@ -233,10 +233,13 @@ metric_plot <- function(ds, met) {
           axis.text.y = element_text(size = 11),
           axis.text.x = element_text(size = 13))
 }
-metric_labels <- c("Overall Accuracy", "Balanced Accuracy", "F1", "Sensitivity", "Pos Pred Value", "Kappa")
-title_labels <- c("A. Overall Accuracy", "B. Balanced Accuracy", "C. F1 Score", "D. Sensitivity", "E. Pos. Pred. Value", "F. Kappa")
+# metric_labels <- c("Overall Accuracy", "Balanced Accuracy", "F1", "Sensitivity", "Pos Pred Value", "Kappa")
+# title_labels <- c("A. Overall Accuracy", "B. Balanced Accuracy", "C. F1 Score", "D. Sensitivity", "E. Pos. Pred. Value", "F. Kappa")
+metric_labels <- c("Overall Accuracy", "Kappa", "Sensitivity", "Pos Pred Value")
+title_labels <- c("A. Overall Accuracy", "B. Kappa", "C. Sensitivity", "D. Pos. Pred. Value")
 metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., title_labels, ~.x + ggtitle(.y))
-(metric_plots[[1]] + metric_plots[[2]])/(metric_plots[[3]]+metric_plots[[4]])/(metric_plots[[5]] + metric_plots[[6]])
+(metric_plots[[1]] + metric_plots[[2]])/(metric_plots[[3]]+metric_plots[[4]])
+# (metric_plots[[1]] + metric_plots[[2]])/(metric_plots[[3]]+metric_plots[[4]])/(metric_plots[[5]] + metric_plots[[6]])
 
 ```
 
@@ -297,7 +300,6 @@ apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD"
 
 The first set of analyses use data from the proximal comparison, in which video annotations and motion data were tightly synchronized (within 30-60 ms). This high degree of synchronization makes it possible to link human-coded body position annotations to each 4-s window of motion data, providing ground truth data for model training and testing. As in past work [@FranchakScott2021], we compared two types of models. To assess the accuracy of body position classification for each recording session, we held back the last 25% of a session's proximal comparison data as the testing set. The testing set was never used as training data. A *group model* was trained for each session using an aggregated dataset containing the first 75% of all **other** sessions' proximal comparison data. This leave-one-out cross-validation tested the generalization of the model to a recording session that was not used at all in training. In contrast, *individual models* were trained using the first 75% of a recording session, then tested against the last 25%. The individual model tests whether earlier training data generalize to later testing data within an individual participant's recording. In both cases, the testing set was the same, allowing for direct comparison between the two modeling approaches. 
 
-<!-- GET RID OF BALANCED ACCURACY AND F1, MOVE KAPPA UP, THEN DO SENS/PPV -->
 Figure \@ref(fig:metrics) and Table \@ref(tab:metrics-table) summarize the performance of group and individual models using standard metrics for classification. Overall accuracy (Figure \@ref(fig:metrics)A) represents the proportion of 4-s windows in the testing set in which the model prediction matched the human annotation of body position. Median overall accuracy was `r metrics_lookup["Overall Accuracy", "median_Group"]` for group models and `r metrics_lookup["Overall Accuracy", "median_Individual"]` for individual models. Although individual model accuracy was greater than group model accuracy, group model accuracy approached the level of agreement found between two human coders (median = .92) indicating that group models could adequately replace human coders. Still, it is notable that the worst-case accuracy from group models (minimum = `r metrics_lookup["Overall Accuracy", "min_Group"]`) was considerably lower than in individual models (minimum = `r metrics_lookup["Overall Accuracy", "min_Individual"]`). Possibly, individual models accounted for idiosyncrasies in behavior or inconsistencies in sensor placement for those sessions that group models could not generalize to.
 
 Strong overall accuracy can be misleading when class prevalence is unbalanced. For example, most infants spent longer sitting than prone, so good performance for sitting classification could mask poorer performance in prone classification. Accordingly, we report Cohen's kappa, a commonly-used metric that penalizes missing rare events (Figure \@ref(fig:metrics)), and provide classification metrics for each individual body position (Table \@ref(tab:metrics-by-class)) to account for imbalance in body position rates within and between individuals. Similar to overall accuracy, kappa values were strong for both model types with median group kappas (`r metrics_lookup["Kappa", "median_Group"]`) somewhat worse compared with median individual kappas (`r metrics_lookup["Kappa", "median_Individual"]`). Guidelines for interpreting kappa statistics [@LandisKoch1977] consider 0.81–1.00 "Almost Perfect,” 0.61–0.80 “Substantial,” 0.41–0.60 “Moderate,” 0.21– 0.40 “Fair,” and 0–0.20 “Slight to Poor”, indicating that agreement for most group and individual model predictions fell in the Substantial to Almost Perfect range.
