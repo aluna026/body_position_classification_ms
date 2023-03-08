@@ -240,9 +240,9 @@ metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., 
 
 ```
 
-```{r metricstable, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+```{r metric-stable, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
 
-metrics_long %>% group_by(Model, metric) %>% 
+metrics_summary <- metrics_long %>% group_by(Model, metric) %>% 
   get_summary_stats(value) %>% 
   select(-(variable:max), -(q1:mad), -se, -ci) %>% 
   pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
@@ -251,9 +251,16 @@ metrics_long %>% group_by(Model, metric) %>%
   relocate(sd_Group, .after = mean_Group) %>% 
   mutate(across(-metric, ~ apa_num(.x, digits = 3)),
          metric = factor(metric, levels = metric_labels)) %>% 
-  arrange(metric) %>% 
-  apa_table(., col.names = c("Metric", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)),
+  arrange(metric)
+ 
+  apa_table(metrics_summary, col.names = c("Metric", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)),
           caption = "Summary statistics for model performance metrics shown separately for group and individual models.")
+  
+metrics_lookup <- metrics_long %>% group_by(Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:n), -(q1:mad), -se, -ci) %>%
+  pivot_wider(names_from = Model, values_from = c("min","max","median", "mean", "sd"))
+    column_to_rownames("metric")
 ```
 
 \renewcommand{\arraystretch}{.75}
@@ -287,6 +294,10 @@ apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD"
           midrules = c(5, 10, 15, 20),
           caption = "Model performance metrics for each body position category, shown separately for group and individual models.")
 ```
+
+The first set of analyses use data from the proximal comparison, in which video annotations and motion data were tightly synchronized (within 30-60 ms). This high degree of synchronization makes it possible to link human-coded body position annotations to each 4-s window of motion data, providing ground truth data for model training and testing. As in past work [@FranchakScott2021], we compared two types of models. To assess the accuracy of body position classification for each recording session, we held back the last 25% of a session's proximal comparison data as the testing set. The testing set was never used as training data. A *group model* was trained for each session using an aggregated dataset containing the first 75% of all **other** sessions' proximal comparison data. This leave-one-out cross-validation tested the generalization of the model to a recording session that was not used at all in training. In contrast, *individual models* were trained using the first 75% of a recording session, then tested against the last 25%. The individual model tests whether earlier training data generalize to later testing data within an individual participant's recording. In both cases, the testing set was the same, allowing for direct comparison between the two modeling approaches. 
+
+Figure \@ref(fig:metrics)) and Table \@ref(tab:metrics-table)) summarize the performance of group and individual models using standard metrics for classification. 
 
 ## Goal 2: Assess the distal accuracy of body position classification models
 
