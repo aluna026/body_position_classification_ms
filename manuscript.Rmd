@@ -207,7 +207,7 @@ duration <- ppts %>% group_by(id_uni) %>%
   mutate(duration = as.duration(end_time - start_time), duration_hours = as.numeric(duration, "hours")) %>% arrange(duration)
 ```
 
-We report four sets of results based on `r length(unique(ppts$id_uni))` full-day testing sessions resulting in a total of `r sum(duration$duration_hours)` hours of movement recording. 
+We report four sets of results based on `r length(unique(ppts$id_uni))` full-day testing sessions resulting in a total of `r sum(duration$duration_hours)` hours of movement recording. First, we focus on the accuracy of group and individual models trained and validated on the proximal comparison period. This period is unique in having the highest degree of temporal synchrony between video and motion data, allowing us to assess the accuracy of individual body position events. Second, we applied models trained from data during the proximal comparison to predict infant behavior during the distal comparison, when coarser synchrony between video and motion data was available. This distal comparison is crucial, because it provides the first ever test of how well body classification models predict behavior beyond the initial, supervised period. Data from the first two sets of analyses confirm that body position classification models are accurate across a long period of time, suggesting that data from the entire day should be valid. In the third set of results we examine the data quality of full-day recordings, and in the fourth set of results we test whether full-day recordings capture well-established age differences in body position experiences.
 
 ## Assess the Proximal Accuracy of Body Position Classification Models
 
