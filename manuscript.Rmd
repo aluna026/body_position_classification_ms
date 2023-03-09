@@ -409,7 +409,7 @@ Visual inspection of Figure \@ref(fig:part2overall) indicated two extreme outlie
 
 What is notable about both outliers is that disagreements were restricted to a particular border case (supine vs. sitting; upright vs. held); accuracy for other classes remained strong. This suggests that their poor performance came as a result of spending a long time in an ambiguous position, not the result of the entire model failing to generalize to the later time period (or an error in sensor placement, such as if the parent removed the leggings and put them on backwards after a diaper change). To better capture the typical level of agreement, we report all correlations in Table \@ref(tab:pt2overalltable) excluding the two outliers. Overall agreement among the non-outlier sessions was excellent for both group models (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). With the exception of held, within-class agreement was strong for the other four body positions.
 
-```{r part2bins, warning=FALSE, fig.cap="Prediction performance (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+```{r part2bins, warning=FALSE, fig.cap="Prediction difference (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 calculate_agreement_bins <- function(ds) {
   ds <- ds %>% group_by(file) %>% 
     mutate(sample = row_number(), bin = floor(sample/300)) %>% 
@@ -440,6 +440,8 @@ difference_plot <- function(ds) {
   scale_y_continuous(name = "Prediction Difference (min)", breaks = seq(-1, 1, .2), labels = seq(-10, 10, 2), minor_breaks = waiver()) + 
     theme(axis.text.x = element_text(size = 13, color = "black"))
 }
+#Difference variable is scaled as proportion, but plotted against min/max of 10 minutes
+
 difference_plots <- map(agree_bins, ~ difference_plot(.x))
 difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 difference_plots[[1]] + difference_plots[[2]]
@@ -467,9 +469,26 @@ apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group"
           midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
 ```
 
+```{r prediction-difference}
+group_diff <- agree_bins$group %>% 
+  mutate(diff = (prop_human - prop_model)*10,
+         less_than_1 = ifelse(diff >= -1 & diff <= 1, 1, 0))
+group_diff <- group_diff %>% group_by(pos) %>% mutate(n = n()) %>% summarize(prop = sum(less_than_1), total = mean(n)) %>% mutate(prop = apa_num(prop/total*100)) %>% column_to_rownames("pos")
+
+ind_diff <- agree_bins$split %>% 
+  mutate(diff = (prop_human - prop_model)*10,
+         less_than_1 = ifelse(diff >= -1 & diff <= 1, 1, 0))
+ind_diff <- ind_diff %>% group_by(pos) %>% mutate(n = n()) %>% summarize(prop = sum(less_than_1), total = mean(n)) %>% mutate(prop = apa_num(prop/total*100)) %>% column_to_rownames("pos")
+```
+
 ### Short-Timescale Agreement during the Distal Comparison
 
-Collecting real-time data that can be synchronized to other sources is a key goal in our development of long-form body position classification. Although overall aggregate agreement in the distal comparison was strong, it is important to show that similarly strong agreement is found within a shorter timescale. We repeated agreement analysis, correlating human-coded body position prevalence with model-predicted prevalence, after dividing the distal comparison period into nine 10-min bins (marked by vertical dashed lines in Figure \@ref(fig:exemplar-timeline)). 
+Collecting real-time data that can be synchronized to other sources is a key goal in our development of long-form body position classification. Although overall aggregate agreement in the distal comparison was strong, it is important to show that similarly strong agreement is found within a shorter timescale. We repeated agreement analysis, correlating human-coded body position prevalence with model-predicted prevalence, after dividing the distal comparison period into nine 10-minute bins (marked by vertical dashed lines in Figure \@ref(fig:exemplar-timeline)). Infants had varying numbers of 10-minute bins depending on much time they were awake and on camera. Bins were included only if there was > X minutes of usable data.
+<!-- RANGE OF BINSm USABLE DATA -->
+
+Table \@ref(tab:pt2binstable) shows the agreement correlation coefficients for group and individual models, including and excluding the outliers identified in the previous section. Performance at a short timescale was similar to performance overall: Overall agreement after excluding outliers was excellent for both group (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). Within-position correlations were weakest for held and strongest for upright regardless of the model type. Agreement for prone was better for group models, whereas sitting and supine were better predicted by individual models. 
+
+To describe the observed amount of prediction error in 10-minute bins, we subtracted the predicted duration (in minutes) for each body position in each bin from the human coded duration in that bin to create a prediction difference score. A score of 0 would indicate no error; positive differences indicate that the model overestimated the amount of time in a position, whereas negative differences indicate underestimation. Figure \@ref(fig:part2bins) plots the mean prediction difference for each session for each body position. The gray shaded area marks ± 1 minute of prediction error. The vast majority of session-averaged predictions fall within 1 minute of error without a clear bias towards overestimation or underestimation (with the previously-identified outliers as exceptions). For group models, we calculated the percentage of 10-min bins across participants that had errors < 1 minute: `r group_diff["Held","prop"]`% for held, `r group_diff["Supine","prop"]`% for supine, `r group_diff["Prone","prop"]`% for prone, `r group_diff["Sitting","prop"]`% for sitting, and `r group_diff["Upright","prop"]`% for upright. For individual models, the percent of 10-min bins with < 1 minute of error was: `r ind_diff["Held","prop"]`% for held, `r ind_diff["Supine","prop"]`% for supine, `r ind_diff["Prone","prop"]`% for prone, `r ind_diff["Sitting","prop"]`% for sitting, and `r ind_diff["Upright","prop"]`% for upright. Taken together, these results suggest that most estimates across models, sessions, and body positions had small amounts of prediction error even after a long delay separating the period that models were trained and tested.
 
 ## Goal 3: Examine the data quality of full-day home recordings
 
