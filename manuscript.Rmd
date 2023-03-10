@@ -617,6 +617,15 @@ pos_sum_age <- map(fullday, fullday_long) %>%
             group_by(group, position) %>% 
             get_summary_stats(mean) %>% 
             select(group, position, mean, sd))
+
+pos_sum_lookup <- pos_sum_age %>% 
+  map2_dfr(c("Group", "Individual"), 
+                         ~ mutate(.x, Model = .y) %>%
+                           select(-sd) %>% 
+                           pivot_wider(names_from = group, values_from = mean)) %>% 
+  pivot_wider(names_from = Model, values_from = c("Younger", "Older")) %>% 
+  column_to_rownames("position")
+
 pos_sum_age <- pos_sum_age %>% map2_dfr(c("Group", "Individual"), 
                          ~ mutate(.x, Model = .y,
                                   mean_sd = str_glue("{apa_num(mean, digits = 1)}% ({apa_num(sd, digits = 1)})")) %>% 
@@ -624,12 +633,34 @@ pos_sum_age <- pos_sum_age %>% map2_dfr(c("Group", "Individual"),
                            pivot_wider(names_from = group, values_from = mean_sd)) %>% 
   pivot_wider(names_from = Model, values_from = c("Younger", "Older")) %>% 
   relocate(Younger_Individual, .after = Older_Group)
+
 apa_table(pos_sum_age, col.names = c("Position", "Younger", "Older", "Younger", "Older"), col_spanners = list("Group" = c(2, 3), "Individual" = c(4, 5)),
           caption = "Summary of age differences in full-day body position for younger (4- to 7-month) and older (11- to 14-month) infants. Values shown are the mean percent of time for each body position averaged across infants in each group. Standard deviations are shown in parentheses. Descriptive statistics are shown separately for group and individual models.")
 
 ```
 
-### Did Full-Day Estimates of Body Position Reveal Age Differences?
+```{r pos-correlations}
+pos_sum_ppt <- map(fullday, 
+                   ~ group_by(.x, age, id_uni) %>% 
+                     filter(is.na(nap_time)) %>% 
+                     summarize(across(sit_time:upright_time, \(x) mean(x, na.rm = TRUE))) %>% 
+                     ungroup %>% select(-id_uni))
+
+age_cor_group <- cor_mat(pos_sum_ppt$group)
+age_cor_group_pval <- age_cor_group %>% cor_get_pval() %>% column_to_rownames("rowname")
+age_cor_group <- age_cor_group %>% column_to_rownames("rowname")
+age_cor_ind <- cor_mat(pos_sum_ppt$split)
+age_cor_ind_pval <- age_cor_ind %>% cor_get_pval() %>% column_to_rownames("rowname")
+age_cor_ind <- age_cor_ind %>% column_to_rownames("rowname")
+```
+
+### Can Full-Day Estimates of Body Position Reveal Age Differences?
+
+In the last analysis, we demonstrate how the full-day recordings can reveal individual differences in body position according to age. Past work using sparse EMA surveys across the day [@Survey] found that from 3-12 months, infants spent less time held, reclined, and supine but spent increasingly more time sitting and upright. Prone time changed little. Table \@ref(tab:agetable) summarizes the percent of time that younger and older infants spent in each body position out of their awake samples, as predicted by group and individual models.
+
+The most straightforward comparisons between the two investigations are upright and prone, because they were defined identically. In @Survey, upright time increased from 0.6-5.5% of the time for infants 3-6 months, increasing to 22.0% at 12 months. Similarly, younger infants' sitting time estimated from full-day group models was `r pos_sum_lookup["Upright", "Younger_Group"]`% compared with `r pos_sum_lookup["Upright", "Older_Group"]`% for the older group. In @Survey, prone time increased ranged from 2.9-9.2% of the time for infants 3-6 months, and was 7.2% at 12 months. In the current study, younger infants' prone time was was `r pos_sum_lookup["Prone", "Younger_Group"]`% and `r pos_sum_lookup["Prone", "Older_Group"]`% for older infants. Held, sitting, and supine are more difficult to compare because prior work [@Survey] considered held any time that infants were in caregivers' arms or on their laps, however, we only counted laying or sitting on caregivers' laps as supine and sitting, respectively. Further complicating the comparison, @Survey included a reclined category that we would classify as either supine or sitting depending on the specifics. Although the numbers are less directly comparable, our results are similar in showing that held and supine time was less for older infants than younger infants. Sitting was greater for older infants (`r pos_sum_lookup["Sitting", "Older_Group"]`%) compared with younger infants (`r pos_sum_lookup["Sitting", "Younger_Group"]`%). Moreover, sitting was the most frequent body position followed by upright in 12-month-olds [@Survey], just as we observed in the current study. Overall, the estimates from the current investigation are consistent with age differences found using a different methodology. 
+
+Figure \@ref(fig:age) shows that both group and individual model predictions captured age-related differences in body position. Age in months and upright time were significantly, positively correlated using group (*r* = `r age_cor_group["age","upright_time"]`, *p* `r apa_p(age_cor_group_pval["age","upright_time"])`)
 
 # Discussion
 
