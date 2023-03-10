@@ -126,7 +126,7 @@ In the current study, we report the feasibility and validity of body position cl
 
 A second, *distal comparison* period followed the proximal comparison period and captured approximately 90 minutes of home behavior that was completely unsupervised. Caregivers and infants could (and did) do whatever they wished. Because this recording happened a considerable amount of time after the initial setup and instructions from the experimenter, accuracy could decline if caregivers or infants moved the garment or sensors. Moreover, increasing variation in everyday activities during the distal comparison creates a greater challenge for classification, testing whether machine learning models can generalize to novel test cases. Thus, the **second goal** of our study was to assess accuracy during the distal comparison. 
 
-After this second video recording period, we asked caregivers to keep infants wearing IMUs for the rest of the day until their regular bedtime, creating the **first real-time, full-day dataset of infant body position**. Interpreting such data required caregivers to log when infants napped, when they removed the sensor garment for diaper changes or other reasons, and when infants went to bed at the end of the day. The **third goal** of the study was to examine the quality of the full-day data. Could body position be successfully recorded over the desired period? Finally, the novel full-day dataset affords us a unique chance to ask whether the estimated time infants spent in different body positions align with past results using video and survey methods. Thus, the **fourth goal** of the current study was to determine whether full-day body position measurements conformed to expectations about age differences in body position. Based on past results [@Survey], infants should spend increasingly more time sitting and upright but less time supine over the age range tested (4 to 14 months). 
+After this second video recording period, we asked caregivers to keep infants wearing IMUs for the rest of the day until their regular bedtime, creating the **first real-time, full-day dataset of infant body position**. Interpreting such data required caregivers to log when infants napped, when they removed the sensor garment for diaper changes or other reasons, and when infants went to bed at the end of the day. Finally, the **third goal** of the study was to examine the quality of the full-day data. Could body position be successfully recorded over the desired period? The novel full-day dataset affords us a unique chance to ask whether the estimated time infants spent in different body positions align with past results using video and survey methods. Thus, we determined whether full-day body position measurements conformed to expected age differences in body position. Based on past results [@Survey], infants should spend increasingly more time sitting and upright but less time supine over the age range tested (4 to 14 months). 
 
 # Methods
 
@@ -490,7 +490,7 @@ Table \@ref(tab:pt2binstable) shows the agreement correlation coefficients for g
 
 To describe the observed amount of prediction error in 10-minute bins, we subtracted the predicted duration (in minutes) for each body position in each bin from the human coded duration in that bin to create a prediction difference score. A score of 0 would indicate no error; positive differences indicate that the model overestimated the amount of time in a position, whereas negative differences indicate underestimation. Figure \@ref(fig:part2bins) plots the mean prediction difference for each session for each body position. The gray shaded area marks ± 1 minute of prediction error. The vast majority of session-averaged predictions fall within 1 minute of error without a clear bias towards overestimation or underestimation (with the previously-identified outliers as exceptions). For group models, we calculated the percentage of 10-min bins across participants that had errors < 1 minute: `r group_diff["Held","prop"]`% for held, `r group_diff["Supine","prop"]`% for supine, `r group_diff["Prone","prop"]`% for prone, `r group_diff["Sitting","prop"]`% for sitting, and `r group_diff["Upright","prop"]`% for upright. For individual models, the percent of 10-min bins with < 1 minute of error was: `r ind_diff["Held","prop"]`% for held, `r ind_diff["Supine","prop"]`% for supine, `r ind_diff["Prone","prop"]`% for prone, `r ind_diff["Sitting","prop"]`% for sitting, and `r ind_diff["Upright","prop"]`% for upright. Taken together, these results suggest that most estimates across models, sessions, and body positions had small amounts of prediction error even after a long delay separating the period that models were trained and tested.
 
-## Goal 3: Examine the data quality of full-day home recordings
+## Examine the Data Quality of Full-Day Home Recordings
 
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
@@ -505,39 +505,50 @@ timeline_data <- read_csv("data/imu-compiled.csv") %>%
                            levels = c("nap_time","upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
                            labels = c("Nap","Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
   arrange(Position, age)
+ 
 
 timelines <- function(ds) {
+  ds$id_uni <- as.numeric(factor(ds$id_uni))
   lims <- as_hms(c('09:00:00', '21:59:00'))
   hour_breaks = as_hms(c('09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00', '21:00:00'))
   label_breaks = c("9am","","11am","","1pm","","3pm","","5pm","","7pm","","9pm")
   ggplot(ds, aes(x = clock_time_start, y = prop, fill = Position)) + 
   geom_bar(stat = "identity") + 
   facet_wrap("id_uni",ncol = 1, strip.position = "left") + 
-  scale_fill_manual(values = c("Nap" = "gray",pal), name = "") + 
+  scale_fill_manual(values = c("Nap" = "gray",pal), name = "") + ylab("") + 
   scale_x_time(breaks = hour_breaks, labels = label_breaks, name = "", limits = lims) + 
-  theme(legend.position = "bottom", 
+  theme(legend.position = "bottom",
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
-        strip.background = element_blank(),
         axis.text.x = element_text(size = 11),
-        strip.text.y = element_blank()) + ylab("")
+        strip.text.y.left = element_text(angle = 360))
   #https://ggplot2tor.com/scales/scale_x_time for options
+  # strip.text.y = element_blank()
+  # strip.background = element_blank(),
 }
 
 timeline_plots <- map(c("Younger", "Older"), ~ timelines(filter(timeline_data, group == .x)))
-timeline_plots <- map2(timeline_plots, c("A. 4-7 Months", "B. 11-14 Months"), ~ .x + ggtitle(.y))
+timeline_plots <- map2(timeline_plots, c("A. Younger Infants (4-7 mo)", "B. Older Infants (11-14 mo)"), ~ .x + ggtitle(.y))
 timeline_plots[[1]] + timeline_plots[[2]]
 ```
 
 ```{r start-time}
 start_times <- ppts %>% group_by(id_uni) %>% slice_min(clock_time_start) %>% pull(clock_time_start) %>% sort
 start_times <- str_sub(as.character(start_times), start = 1, end = -4)
+
+end_times <- ppts %>% group_by(id_uni) %>% slice_max(clock_time_start) %>% pull(clock_time_start) %>% sort
+end_times <- str_sub(as.character(end_times), start = 1, end = -4)
+
+coverage <- ppts %>% mutate(missing = ifelse(is.na(nap_time), 1, 0)) %>%
+  group_by(id_uni) %>% 
+  summarize(blocks = n(), missing = sum(missing, na.rm = T), naps = sum(nap_time, na.rm = T)) %>% 
+  mutate(total = blocks * 5/60, prop_accounted = 1-(missing/blocks), naptime = naps * 5)
 ```
-The start time ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, 
 
-## Goal 4: Assess the suitability of full-day predictions for capturing age differences in body position
+After the distal comparison video ended, caregivers were instructed to keep the sensors on their infants for the remainder of the day until infants went to bed, removing the sensors for naps, diaper changes, and trips out of the house. The first two sets of results show that accuracy was consistently high across the proximal and distal recordings, making us confident that predictions over the remainder of the day would continue to be accurate after the video recordings stopped. 
 
-<!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
+This leads to our last questions---how successfully did recordings capture infants' entire day, and how suitable were daylong recordings for capturing individual differences in body position? Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger and older infants, predicted from the group model. The start time ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, sometimes infants were unexpectedly asleep, leading to a few sessions in which infants began wearing the sensors later than intended. 
+
 
 ```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 fullday_group <- read_csv("data/imu-compiled.csv") %>% 
