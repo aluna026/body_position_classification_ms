@@ -135,7 +135,8 @@ After this second video recording period, we asked caregivers to keep infants we
 ```{r participants, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 ppts <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
-         group = factor(ifelse(age <= 8, "Younger", "Older")))
+         group = factor(ifelse(age <= 8, "Younger", "Older"))) %>% 
+  filter(id_uni != 10401)
 num_younger <- ppts %>% filter(group == "Younger") %>% .$id %>% unique(.) %>% length(.)
 num_older <-  ppts %>% filter(group == "Older") %>% .$id %>% unique(.) %>% length(.)
 num_sessions <- ppts %>% group_by(group, id, session) %>% slice_head(n = 1) %>% count %>% group_by(group, id) %>% count
@@ -536,18 +537,25 @@ timeline_plots[[1]] + timeline_plots[[2]]
 start_times <- ppts %>% group_by(id_uni) %>% slice_min(clock_time_start) %>% pull(clock_time_start) %>% sort
 start_times <- str_sub(as.character(start_times), start = 1, end = -4)
 
-end_times <- ppts %>% group_by(id_uni) %>% slice_max(clock_time_start) %>% pull(clock_time_start) %>% sort
+end_times <- ppts %>% filter(id_uni != 11104, id_uni != 801) %>%
+  group_by(id_uni) %>% slice_max(clock_time_start) %>% pull(clock_time_start) %>% sort
 end_times <- str_sub(as.character(end_times), start = 1, end = -4)
 
 coverage <- ppts %>% mutate(missing = ifelse(is.na(nap_time), 1, 0)) %>%
+  filter(id_uni != 11104, id_uni != 801) %>% 
   group_by(id_uni) %>% 
   summarize(blocks = n(), missing = sum(missing, na.rm = T), naps = sum(nap_time, na.rm = T)) %>% 
-  mutate(total = blocks * 5/60, prop_accounted = 1-(missing/blocks), naptime = naps * 5)
+  mutate(total = blocks * 5/60, 
+         prop_accounted = 1-(missing/(blocks-missing)), 
+         hours_recorded = (blocks-missing-naps)*5/60,
+         naptime = naps * 5/60)
 ```
 
-After the distal comparison video ended, caregivers were instructed to keep the sensors on their infants for the remainder of the day until infants went to bed, removing the sensors for naps, diaper changes, and trips out of the house. The first two sets of results show that accuracy was consistently high across the proximal and distal recordings, making us confident that predictions over the remainder of the day would continue to be accurate after the video recordings stopped. 
+After the distal comparison video ended, caregivers were instructed to keep the sensors on their infants for the remainder of the day until infants went to bed, removing the sensors for naps, diaper changes, and trips out of the house. The first two sets of results show that accuracy was consistently high across the proximal and distal recordings, providing confidence that predictions over the remainder of the day would continue to be accurate after the video recordings stopped. 
 
-This leads to our last questions---how successfully did recordings capture infants' entire day, and how suitable were daylong recordings for capturing individual differences in body position? Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger and older infants, predicted from the group model. The start time ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, sometimes infants were unexpectedly asleep, leading to a few sessions in which infants began wearing the sensors later than intended. 
+This leads to two final questions---how successfully did recordings capture infants' entire day, and how suitable were day-long recordings for capturing individual differences in body position? Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger (A) and older infants (B). Predictions from the group model were used to ensure that motion data were classified consistently across all sessions. Session start times ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, sometimes infants were unexpectedly asleep, leading to a few sessions in which infants began wearing the sensors later than intended (such as \#11 in the younger group). With two exceptions, recordings lasted until the infants' bed time. Older participant \#1 had the equipment picked up on the same day rather than the next day, so the recording ended at 17:00. Older participant \#11 wore the equipment in the morning, but the family left the house at 10:15 and remained out for the rest of the day, choosing not to put the equipment back on when they returned home in the late afternoon. Among those participants who wore the equipment until bedtime, recordings ended between `r end_times[1]` and `r end_times[length(end_times)]` with a median of `r end_times[floor(length(end_times)/2)]`. 
+
+Among participants who wore the sensors from morning to bedtime, the majority of the time during the day either resulted in usable body position data or was excluded due to caregiver-reported naps (gray periods in Figure \@ref(fig:timelines)). The total length of the recording period ranged from `r apa_num(min(coverage$total))`-`r apa_num(max(coverage$total))` hours with a median of `r apa_num(median(coverage$total))` hours. Nap times reported during the recording period ranged from `r apa_num(min(coverage$naptime))`-`r apa_num(max(coverage$naptime))` hours with a median of `r apa_num(median(coverage$naptime))` hours. Of the remaining awake time during the recording period, body position data was collecting during proportions that ranged from `r apa_num(min(coverage$prop_accounted))`-`r apa_num(max(coverage$prop_accounted))` hours with a median of `r apa_num(median(coverage$prop_accounted))`. Younger infant \#13 had the least portion of the waking day accounted for; the family left the house to run errands during the majority of the recording period, and the infant napped during much of the remaining time at home. Overall, the recordings produced a median of `r apa_num(median(coverage$hours_recorded))` hours of motion data, with the entire dataset totaling `r apa_num(sum(coverage$hours_recorded))` hours. 
 
 
 ```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
