@@ -328,11 +328,13 @@ Beyond accuracy, it is important to establish that classification is neither too
 # PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
   filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
-         mutate(pos = factor(pos, levels = pos_levels)) %>% 
+         mutate(pos = factor(pos, levels = pos_levels),
+                code = factor(code, levels = pos_levels)) %>% 
   filter(file != "104/1")
 pt2_split <- read_csv("data/compiled_agreement_split.csv") %>% 
   filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
-         mutate(pos = factor(pos, levels = pos_levels)) %>% 
+         mutate(pos = factor(pos, levels = pos_levels),
+                code = factor(code, levels = pos_levels)) %>% 
   filter(file != "104/1")
 
 outlier_files <- c("107/3", "106/1")
@@ -352,6 +354,7 @@ calculate_agreement <- function(ds) {
   agree_group <- agree_group %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
                             prop_model = ifelse(is.na(prop_model), 0, prop_model))
   agree_group <- complete(agree_group, file, pos, fill = list(prop_human = 0, prop_model = 0))
+  
 }
 
 agree <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement)
@@ -365,7 +368,7 @@ agreement_scatter <- function(ds) {
   scale_shape_manual(guide = "none", values = 22:23) + 
   scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Prevalence (%)") + 
   scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Prevalence (%)") + 
-  facet_wrap("pos", ncol = 2, as.table = F) +
+  facet_wrap("pos", ncol = 2, as.table = T) +
   theme(panel.spacing.x = unit(1, "lines")) +
   theme(panel.spacing.y = unit(1, "lines")) + 
   theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
@@ -579,9 +582,7 @@ fullday <- list("group" = fullday_group, "split" = fullday_split)
 
 fullday_long <- function(ds) {
   ds %>% pivot_longer(cols = sit_time:upright_time, names_to = "position", values_to = "prop") %>% 
-  mutate(position = factor(position,
-                           levels = c("upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
-                           labels = c("Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
+  mutate(position = factor(position, levels = c("supine_time", "prone_time", "sit_time", "upright_time", "held_time"), labels = c("Supine", "Prone", "Sitting", "Upright", "Held"))) %>% 
   arrange(position, age)
 }
 
