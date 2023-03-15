@@ -5,7 +5,7 @@
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metrics-table}Summary statistics for model performance metrics shown separately for group and individual models.}
+\caption{\label{tab:metrics-table}Model performance metrics (overall accuracy, Cohen's Kappa, sensitivity, positive predictive value) from the proximal comparison period. Descriptive statistics are shown separately for group and individual models.}
 
 \begin{tabular}{lllllll}
 \toprule
@@ -31,7 +31,7 @@ Pos Pred Value & 0.826 & 0.810 & 0.125 & 0.928 & 0.899 & 0.107\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:metrics-by-class}Model performance metrics for each body position category, shown separately for group and individual models.}
+\caption{\label{tab:metrics-by-class}Model performance metrics for each body position (supine, prone, sitting, upright, and held) during the proximal comparison period, shown separately for group and individual models.}
 
 \begin{tabular}{llllllll}
 \toprule
@@ -68,7 +68,7 @@ Pos Pred Value & Supine & 0.995 & 0.828 & 0.292 & 1.000 & 0.932 & 0.134\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:pt2overalltable}Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
+\caption{\label{tab:pt2overalltable}Correlations between human-coded and model-predicted body position durations across the entire distal comparison period. Correlations are provided within each body position and overall. Correlations are presented separately for group and individual models with and without the two outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule
@@ -96,7 +96,7 @@ Overall & 0.80 & 0.91 & 0.95 & 0.96\\
 \begin{center}
 \begin{threeparttable}
 
-\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
+\caption{\label{tab:pt2binstable}Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.}
 
 \begin{tabular}{lllll}
 \toprule

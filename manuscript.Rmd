@@ -203,7 +203,7 @@ We report three sets of results based on `r length(unique(ppts$id_uni))` full-da
 
 <!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
 
-```{r metrics, warning=FALSE, fig.cap="Metrics", fig.align="center", fig.width=6, fig.height=3, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+```{r metrics, warning=FALSE, fig.cap="Metrics of agreement between human-annotated body position and model predictions of body position from the proximal comparison period. Overall accuracy (A) and Cohen's Kappa (B) are plotted separately for group models and individual models. Each blue circle represents that accuracy for each recording session. Horizontal black bars indicates the mean across sessions.", fig.align="center", fig.width=6, fig.height=3, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
 metrics <- read_csv("data/group_split_metrics.csv") %>% 
   filter(model %in% c("group", "split")) %>% 
   mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
@@ -245,7 +245,7 @@ metrics_summary <- metrics_long %>% group_by(Model, metric) %>%
   arrange(metric)
  
   apa_table(metrics_summary, col.names = c("Metric", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)),
-          caption = "Summary statistics for model performance metrics shown separately for group and individual models.")
+          caption = "Model performance metrics (overall accuracy, Cohen's Kappa, sensitivity, positive predictive value) from the proximal comparison period. Descriptive statistics are shown separately for group and individual models.")
   
 metrics_lookup <- metrics_long %>% group_by(Model, metric) %>% 
   get_summary_stats(value) %>% 
@@ -283,7 +283,7 @@ class_table$metric[duplicated(class_table$metric)] <- " "
 
 apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD", "Median", "Mean", "SD"), col_spanners = list("Group" = c(3, 5), "Individual" = c(6, 8)),
           midrules = c(5, 10),
-          caption = "Model performance metrics for each body position category, shown separately for group and individual models.")
+          caption = "Model performance metrics for each body position (supine, prone, sitting, upright, and held) during the proximal comparison period, shown separately for group and individual models.")
 metrics_long_summary <- metrics_long_summary %>% 
   mutate(rowname = paste(Class, metric)) %>% 
   column_to_rownames("rowname")
@@ -310,7 +310,7 @@ Beyond accuracy, it is important to establish that classification is neither too
 
 <!-- compiled_agreement, generated from analysis-part2 -->
 
-```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represent data for a single participant. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=7, fig.height=6.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represents data for a single session. The two outlier participants are plotted in dark gray, with a different shape marking each individual. ", fig.align="center", fig.width=7, fig.height=6.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 
 # PART 2 AGREEMENT
 pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
@@ -385,7 +385,7 @@ overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_c
 colnames(overall_row) <- colnames(pt2corr)
 pt2corr <- bind_rows(pt2corr, overall_row)
 apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
-          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations across the entire long delay period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations across the entire distal comparison period. Correlations are provided within each body position and overall. Correlations are presented separately for group and individual models with and without the two outlier participants.")
 ```
 
 In the first set of results, we showed that group and individual models trained from data during the proximal comparison period were accurate at classifying body position in the same recording. In the next analysis, we examine long-term performance by testing how accurately models trained from the proximal period could predict body position during the distal period (Figure \@ref(fig:exemplar-timeline)). A single group model was created using all sessions' proximal period training data (rather than group models leaving out a single session); the same individual models were used. As previously mentioned, distal videos had only coarse temporal synchrony with motion recordings (misalignment of up to ~ 5 s in either direction). This misalignment precluded calculating accuracy based on the proportion of matching events, so we used another technique following past work [@YaoPlotz2019; @FranchakScott2021]. For each session, we summed the amount of time infants were predicted to be in each of the 5 body position categories from the model and compared that to the summed time for the body positions based on human coding. Below, we report correlations between the model-predicted and human-coded aggregated body position time across the entire distal period as well as within finer, 10-minute bins. 
@@ -400,7 +400,7 @@ Visual inspection of Figure \@ref(fig:part2overall) indicated two extreme outlie
 
 What is notable about both outliers is that disagreements were restricted to a particular border case (supine vs. sitting; upright vs. held); accuracy for other classes remained strong. This suggests that their poor performance came as a result of spending a long time in an ambiguous position, not the result of the entire model failing to generalize to the later time period (or an error in sensor placement, such as if the parent removed the leggings and put them on backwards after a diaper change). To better capture the typical level of agreement, we report all correlations in Table \@ref(tab:pt2overalltable) excluding the two outliers. Overall agreement among the non-outlier sessions was excellent for both group models (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). With the exception of held, within-class agreement was strong for the other four body positions.
 
-```{r part2bins, warning=FALSE, fig.cap="Prediction difference (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison. Each point shows the mean and SE for a single participant for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The three outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+```{r part2bins, warning=FALSE, fig.cap="Prediction difference (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison period. Each point shows the mean and SE for a single participant's recording session for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The two outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
 calculate_agreement_bins <- function(ds) {
   ds <- ds %>% group_by(file) %>% 
     mutate(sample = row_number(), bin = floor(sample/300)) %>% 
@@ -457,7 +457,7 @@ colnames(overall_row) <- colnames(pt2corr_bins)
 pt2corr_bins <- bind_rows(pt2corr_bins, overall_row)
 rm(overall_row)
 apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
-          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
 ```
 
 ```{r prediction-difference}
@@ -484,7 +484,7 @@ To describe the observed amount of prediction error in 10-minute bins, we subtra
 
 <!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
 
-```{r timelines, warning=FALSE, fig.cap="Timelines", fig.align="center", fig.width=7.75, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+```{r timelines, warning=FALSE, fig.cap="Full-day timelines for each individual recording session, split by (A) younger infants and (B) older infants. Each participant's timeline shows a stacked bar graph with the proportion of time spent in each of the body position for every 5-minute period throughout the day, based on group model predictions of body position. The x-axis shows time of day. Caregiver-reported naps are marked by gray bars; blank gaps indicate caregiver-reported times that the sensor garment was removed for diaper changes, baths, or trips out of the house.", fig.align="center", fig.width=7.75, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 timeline_data <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
@@ -553,7 +553,7 @@ Considering that body position annotation takes 2-5 hours of labor per 1 hour of
 <!-- CITES -->
 
 
-```{r age, warning=FALSE, fig.cap="Age trends", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+```{r age, warning=FALSE, fig.cap="Age differences in daily body position predicted from (A) group models and (B) individual models. Each circle represents one full-day recording session's proportion of time in each body position (y-axis) against age in months (x-axis). Black lines indicate best fit regression lines indicating decreases in supine time and increases in sitting and upright time with age.", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
 fullday_group <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
