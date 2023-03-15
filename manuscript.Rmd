@@ -1,5 +1,5 @@
 ---
-title             : "Full-day, in home validation of infant body position measurements from inertial sensors"
+title             : "Long-form recording of infant body position in the home using wearable inertial sensors"
 shorttitle        : "Infant position in the home"
 
 author: 
@@ -543,7 +543,7 @@ coverage <- ppts %>% mutate(missing = ifelse(is.na(nap_time), 1, 0)) %>%
 
 After the distal comparison video ended, caregivers were instructed to keep the sensors on their infants for the remainder of the day until infants went to bed, removing the sensors for naps, diaper changes, and trips out of the house. The first two sets of results show that accuracy was consistently high across the proximal and distal recordings, providing confidence that predictions over the remainder of the day would continue to be accurate after the video recordings stopped. This leads to two final questions---how successfully did recordings capture infants' entire day, and how suitable were day-long recordings for capturing individual differences in body position? 
 
-### How Well did Recordings Capture Infants' Entire Day?
+### How Well Did Recordings Capture Infants' Entire Day?
 
 Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger (A) and older infants (B). Predictions from the group model were used to ensure that motion data were classified consistently across all sessions. Session start times ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, sometimes infants were unexpectedly asleep, leading to a few sessions in which infants began wearing the sensors later than intended (such as \#11 in the younger group). With two exceptions, recordings lasted until the infants' bed time. Older participant \#1 had the equipment picked up on the same day rather than the next day, so the recording ended at 17:00. Older participant \#11 wore the equipment in the morning, but the family left the house at 10:15 and remained out for the rest of the day, choosing not to put the equipment back on when they returned home in the late afternoon. Among those participants who wore the equipment until bedtime, recordings ended between `r end_times[1]` and `r end_times[length(end_times)]` with a median of `r end_times[floor(length(end_times)/2)]`. 
 
@@ -652,13 +652,15 @@ Figure \@ref(fig:age) shows that both group and individual model predictions cap
 
 # Discussion
 
+Across three analyses, we demonstrated the validity of long-form recordings of infant body position using wearable inertial sensors. Both group and individual models trained during the proximal comparison period performed well on testing data collected from the same recording period. Most important, accuracy was consistently strong later in the recording when behavior was completely unsupervised: Human-coded and model-predicted durations of body positions during the distal comparison period were highly correlated, even when narrowing to the scale of 10 minutes. Examining full recordings showed that the new method allows us to capture more data (median = `r apa_num(median(coverage$hours_recorded))` hours of awake behavior) than is typical with video methods (1-2 hours) while simultaneously reducing the human labor needed to annotate it. Ultimately, age differences in body position mirrored past findings that employed other methods, suggesting that the end product is suitable for describing developmental changes in motor behavior.
+
 ## Performance Verdict: It Works
 
 Accuracy good compared to typical metrics of agreement, comparable to human agreement, in both proximal and distal comparisons. 
 
 Outlier participants give us more confidence that it actually works as intended. Disagreements limited to some edge cases, not all events/classes. Even w/ outliers (which are they on timelines), most of the rest of the data seems typical for the age group. Some outlier-ish data in age comparisons, but nothing out of the ordinary (hard to know if it's the model or the behavior)
 
-Nice to have video to confirm. Best practice in LENA is to still do some transcription yourself to see what cases it works. Still helpful to have other sources to triangulate against. 
+Nice to have video to confirm. Best practice in LENA is to still do some transcription yourself to see what cases it works. Still helpful to have other sources to triangulate against. Maybe don't use it for a holding detector. 
 
 ## Group and Individual Models
 
@@ -682,6 +684,7 @@ More easily shareable data (non-identifiable, text based)
 - No validation at the end of the day (practically this would be hard to do, syncing a challenge)
 - Limited to within the home. Driving/strollers are motion signals we don't have training data for, but this could be added in the future. 
 - Relying on CG reports of naps/diaper changes. 
+- Bias in training data
 
 ## Conclusions
 
