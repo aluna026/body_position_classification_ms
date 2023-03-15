@@ -652,6 +652,39 @@ Figure \@ref(fig:age) shows that both group and individual model predictions cap
 
 # Discussion
 
+## Performance Verdict: It Works
+
+Accuracy good compared to typical metrics of agreement, comparable to human agreement, in both proximal and distal comparisons. 
+
+Outlier participants give us more confidence that it actually works as intended. Disagreements limited to some edge cases, not all events/classes. Even w/ outliers (which are they on timelines), most of the rest of the data seems typical for the age group. Some outlier-ish data in age comparisons, but nothing out of the ordinary (hard to know if it's the model or the behavior)
+
+Nice to have video to confirm. Best practice in LENA is to still do some transcription yourself to see what cases it works. Still helpful to have other sources to triangulate against. 
+
+## Group and Individual Models
+
+No clear winner. Higher raw accuracy/kappa for individual models; some (but not all) better by-class performance for Kappa's. But group models better for prone; more sensitive for prone and for held; barring outliers; group has some better part 2 correlations depending on the class. Notably, worst outlier in aggregate age difference data was in an individual model. 
+
+Big advantages of group model are that 1) trained on more data (so likely a bit more robust), 2) less dependent on getting the perfect training set, 3) between individual differences are due to behavior, not due to choice of model, 4) can apply to any infant, 5) can apply to an infant for whom we have no video. Individual models might capture some idiosyncracies of movement (or device use) that are hard to get from big model that homogenizes behavior. Individual models are a nice choice for rapid prototyping/piloting/feasibility. Can get proof of concept on a single participant or a new kind of code (loc; stroller use; etc.). Clinical cases too. 
+
+Tell some things we did but didn't report. Tried modeling each age separately but there was no overall improvement in performance. Categories are so broad and include less/more mature forms of behavior. Not independent sitting, but all kinds of sitting. Tried other ML algorithms. Tried fewer sensors. 
+
+## What does this get us?
+
+Other things look a bit wacky, but within-day heterogeniety is the point. Shouldn't be surprised to find it. Some can confirm on video. Activity are a big shaper of behavior, have enough behavior to actually see it. 
+
+See how other aspects of behavior align w/ movement in real time. See how new motor skills relate to chg in daily behavior. 
+
+Efficiency. Hours saved. 
+
+More easily shareable data (non-identifiable, text based)
+
+## Limitations
+- No validation at the end of the day (practically this would be hard to do, syncing a challenge)
+- Limited to within the home. Driving/strollers are motion signals we don't have training data for, but this could be added in the future. 
+- Relying on CG reports of naps/diaper changes. 
+
+## Conclusions
+
 \newpage
 
 # References
