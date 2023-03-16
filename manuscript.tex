@@ -597,17 +597,18 @@ Overall accuracy and kappa values were better in individual models compared with
 
 Aside from differences in validity, researchers may favor one modeling approach based on logistical concerns. Group models have several major advantages. First, by definition they are trained on more data, which might make predictions more consistent. Second, group models remove the need to get optimal training data from each participant. It can be difficult to elicit every behavior of interest in each infant; individual models require that every behavior that will be later predicted was displayed by each individual infant. In fact, group models remove the need to get \emph{any} training data for a particular infant, meaning that they can be applied to any infant regardless of whether they have training data. Finally, applying a group model means that individual differences between infants are due to their behavior being classified in a consistent way, rather than having a separate set of rules for predicting each individual. However, given the variety in infant behavior, individual models are more agile in that they can capture the unique and unexpected. Likewise, individual models can be an excellent choice for rapid prototyping and pilot testing. A researcher can get proof-of-concept data from a single participant or a new kind of classification scheme (i.e., locomotion, restrain in device) without annotating an entire sample. Individual models may also be applied in clinical cases where infants vary widely in their motor abilities and/or use of assistive devices.
 
-Beyond group and individual models, there were many degrees of freedom in our choice of how best to model body position. For the sake of brevity, we did not report every possible variation, only the best approach. However, our openly shared data mean that researchers can experiment with different sets of motion features, different sets of training data, different machine learning algorithms, and different sets of hyperparameters. As in past work (Airaksinen et al., 2020), performance is best when using all four sensors and degrades when using any subset of two (i.e., hips only, left leg only). We tested but did not report models that used either only accelerometer data and only gyroscope data; in both cases, performance is degraded compared with models that use both types of motion. We also tried different machine learning algorithms (XGBoost, Tabnet), but found that random forest models performed the best. Finally, we tried modeling each age group separately, but found no boost in performance by tailoring to the particular age group.
+Beyond group and individual models, there were many degrees of freedom in our choice of how best to model body position. For the sake of brevity, we did not report every possible variation, only the best approach. However, our openly shared data mean that researchers can experiment with different sets of motion features, different sets of training data, different machine learning algorithms, and different sets of hyperparameters. As in past work (Airaksinen et al., 2020), performance is best when using all four sensors and degrades when using any subset of two (i.e., hips only, left leg only). We tested but did not report models that used either only accelerometer data and only gyroscope data; in both cases, performance is degraded compared with models that use both types of motion. We also tried different machine learning algorithms (XGBoost, Tabnet), but found that random forest models performed the best. Finally, we tried modeling each age group separately, but found no benefit to performance by tailoring to the particular age group.
 
-\hypertarget{what-does-this-get-us}{%
-\subsection{What does this get us?}\label{what-does-this-get-us}}
+\hypertarget{novel-research-possibilities}{%
+\subsection{Novel Research Possibilities}\label{novel-research-possibilities}}
 
-Other things look a bit wacky, but within-day heterogeniety is the point. Shouldn't be surprised to find it. Some can confirm on video. Activity are a big shaper of behavior, have enough behavior to actually see it.
+Long-form recordings of motor behavior bring about new research possibilities. Although past work using video (Chen et al., 2022; Herzberg et al., 2021; Karasik et al., 2011) produced real-time data, such data were limited to a relatively small part of the infants' day. And although survey methods (Franchak, 2019) could capture moments scattered throughout the day, they do not produce real-time data. The combination of real-time, full-day data about infant motor behavior is unprecedented and offers new opportunities for understanding infants' everyday experiences. Collecting dense data over the entire variety of daily experiences helps to more accurately measure infants' experiences in aggregate (as in Figure \ref{fig:age}) without biasing results from a particular type of activity (e.g., play). Long-form recordings also have the potential measure clinically-relevant outcomes, such as whether a physical therapy intervention to improve infant sitting skill leads to increases in everyday sitting time. But as Figure \ref{fig:timelines} shows, aggregating responses masks the rich temporal structure contained within long-form recordings.
 
-See how other aspects of behavior align w/ movement in real time. See how new motor skills relate to chg in daily behavior.
-LINK TO AGE DIFFS. Some outlier-ish data in age comparisons, but nothing out of the ordinary (hard to know if it's the model or the behavior)
+In the past decade, developmental scientists have discovered that distributional information about infants' experiences matter for how infants learn (Clerkin et al., 2017; Kachergis et al., 2017; Raz et al., 2019). Skewed distributions that favor the repetition of a small subset of experiences facilitate learning. For example, recordings from wearable head cameras in the home indicate that infants see a small subset of objects with high frequency (Clerkin et al., 2017), but most objects are seen infrequently. Heterogeneity is also found in how experiences are distributed in time---burstiness and clustering are seen in infants' daily experiences seeing objects and hearing music. Long-form motor recordings provide a novel opportunity to measure the temporal structure of motor experiences. How skewed are infants' experiences with different motor behaviors, and how are they clustered in time? Linking the distributional structure of a particular motor experience in a real day, such as time spent sitting, might be predicted by sitting skill and/or might infants' future sitting ability.
 
-Efficiency. Hours saved.
+Moreover, real-time recording of motor behavior provides a way to measure how infant motor behavior links to other types of experiences in the moment in daily life. As we reviewed, Malachowski et al. (2023) used a combination of LENA® and EMA surveys to find that infants heard less adult speech when restrained in seating devices. Combining LENA® and long-form motor recordings can take this a step further by measuring more precisely how speech and body position covary within a day. Synchronizing long form motor recordings to other continuous monitors, such as wearable ECG (Wass et al., 2022) can provide information about how infant arousal relates to motor behavior. ``TotTag''---a wearable device for measuring infant-caregiver distance (Salo et al., 2022)---or caregiver worn activity trackers/physiology monitors could be paired with body position classification to better understand how moment-to-moment interpersonal dynamics relate to infant motor behavior.
+
+What underpins these novel research applications is that body position classifications can be applied automatically at scale. Annotating a video corpus of infant behavior from a moderately sized sample---such as 40 infants recorded for 2 hours each in 2 separate visits (Herzberg et al., 2021)---is incredibly labor intensive. Annotating a larger, more representative sample of \emph{hundreds of infants} while simultaneously scoring \emph{full-day data} would be prohibitive. With sufficiently accurate group models, researchers could annotate a moderate video sample to then apply the model to hundreds of full-day recordings. The added cost of more recording time is low, meaning that future studies could sample across multiple days of behavior to better understand intra- versus inter-day variability. Prior diary methods show that infants inconsistently display new motor skills on a day-to-day basis (Adolph et al., 2008; Adolph \& Robinson, 2011). Multi-day recordings could further uncover how infants' experiences vary over timescales from seconds to days.
 
 More easily shareable data (non-identifiable, text based)
 
@@ -636,6 +637,12 @@ More easily shareable data (non-identifiable, text based)
 
 \hypertarget{refs}{}
 \begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-AdolphRobinson2011}{}}%
+Adolph, K. E., \& Robinson, S. R. (2011). Sampling development. \emph{Journal of Cognition and Development}, \emph{12}, 411--423. \url{https://doi.org/10.1080/15248372.2011.608190}
+
+\leavevmode\vadjust pre{\hypertarget{ref-AdolphRobinson2008}{}}%
+Adolph, K. E., Robinson, S. R., Young, J. W., \& Gill-Alvarez, F. (2008). What is the shape of developmental change? \emph{Psychological Review}, \emph{115}, 527--543. \url{https://doi.org/10.1037/0033-295X.115.3.527}
+
 \leavevmode\vadjust pre{\hypertarget{ref-AdolphCTL2014}{}}%
 Adolph, K. E., \& Tamis-LeMonda, C. S. (2014). The costs and benefits of development: The transition from crawling to walking. \emph{Child Development Perspectives}, \emph{8}, 187--192. \url{https://doi.org/10.1111/cdep.12085}
 
@@ -675,6 +682,9 @@ Bruijns, B. A., Truelove, S., Johnson, A. M., Gilliland, J., \& Tucker, P. (2020
 \leavevmode\vadjust pre{\hypertarget{ref-ChenSchneider2022}{}}%
 Chen, Q., Schneider, J. L., West, K. L., \& Iverson, J. M. (2022). Infant locomotion shapes proximity to adults during everyday play in the u.s. \emph{Infancy}. \url{https://doi.org/10.1111/infa.12503}
 
+\leavevmode\vadjust pre{\hypertarget{ref-ClerkinHart2017}{}}%
+Clerkin, E. M., Hart, E., Rehg, J. M., Yu, C., \& Smith, L. B. (2017). Real-world visual statistics and infants' first-learned object names. \emph{Philosophical Transactions of the Royal Society B}, \emph{372}, 20160055.
+
 \leavevmode\vadjust pre{\hypertarget{ref-CliffReilly2009}{}}%
 Cliff, D. P., Reilly, J. J., \& Okely, A. D. (2009). Methodological considerations in using accelerometers to assess habitual physical activity in children aged 0--5 years. \emph{Journal of Science and Medicine in Sport}, \emph{12}(5), 557--567.
 
@@ -713,6 +723,9 @@ Hager, E., Tilton, N., Wang, Y., Kapur, N., Arbaiza, R., Merry, B., \& Black, M.
 
 \leavevmode\vadjust pre{\hypertarget{ref-HerzbergFletcher2021}{}}%
 Herzberg, O., Fletcher, K. K., Schatz, J. L., Adolph, K. E., \& Tamis-LeMonda, C. S. (2021). Infant exuberant object play at home: Immense amounts of time-distributed, variable practice. \emph{Child Development}, \emph{93}(1), 150--164.
+
+\leavevmode\vadjust pre{\hypertarget{ref-KachergisYu2017}{}}%
+Kachergis, G., Yu, C., \& Shiffrin, R. M. (2017). A bootstrapping model of frequency and context effects in word learning. \emph{Cognitive Science}, \emph{41}(3), 590--622.
 
 \leavevmode\vadjust pre{\hypertarget{ref-KadookaCaufield2021}{}}%
 Kadooka, K., Caufield, M., Fausey, C. M., \& Franchak, J. M. (2021, April). Visuomotor learning opportunities are nested within everyday activities. \emph{Paper Presented at the Biennial Meeting of the Society for Research in Child Development}.
@@ -783,8 +796,14 @@ R Core Team. (2021). \emph{R: A language and environment for statistical computi
 \leavevmode\vadjust pre{\hypertarget{ref-RasanenSeshadri2020}{}}%
 Räsänen, O., Seshadri, S., Lavechin, M., Cristia, A., \& Casillas, M. (2020). {ALICE}: An open-source tool for automatic measurement of phoneme, syllable, and word counts from child-centered daylong recordings. \emph{Behavior Research Methods}, \emph{53}(2), 818--835. \url{https://doi.org/10.3758/s13428-020-01460-x}
 
+\leavevmode\vadjust pre{\hypertarget{ref-RazAbney2019}{}}%
+Raz, H. K., Abney, D. H., Crandall, D., Yu, C., \& Smith, L. B. (2019). How do infants start learning object names in a sea of clutter? \emph{Annual Conference of the Cognitive Science Society}, 521--526.
+
 \leavevmode\vadjust pre{\hypertarget{ref-RenDing2016}{}}%
 Ren, X., Ding, W., Crouter, S. E., Mu, Y., \& Xie, R. (2016). Activity recognition and intensity estimation in youth from accelerometer data aided by machine learning. \emph{Applied Intelligence}, \emph{45}(2), 512--529.
+
+\leavevmode\vadjust pre{\hypertarget{ref-SaloPannuto2022}{}}%
+Salo, V. C., Pannuto, P., Hedgecock, W., Biri, A., Russo, D. A., Piersiak, H. A., \& Humphreys, K. L. (2022). Measuring naturalistic proximity as a window into caregiver--child interaction patterns. \emph{Behavior Research Methods}, \emph{54}(4), 1580--1594. \url{https://doi.org/10.3758/s13428-021-01681-8}
 
 \leavevmode\vadjust pre{\hypertarget{ref-SchnellerBentsen2017}{}}%
 Schneller, M. B., Bentsen, P., Nielsen, G., Brønd, J. C., Ried-Larsen, M., Mygind, E., \& Schipperijn, J. (2017). Measuring children's physical activity. \emph{Medicine \& Science in Sports \& Exercise}, \emph{49}(6), 1261--1269. \url{https://doi.org/10.1249/mss.0000000000001222}
