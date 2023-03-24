@@ -488,7 +488,6 @@ timeline_data <- read_csv("data/imu-compiled.csv") %>%
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
          nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
-  filter(id_uni != 10401) %>% 
   pivot_longer(cols = nap_time:upright_time, names_to = "position", values_to = "prop") %>% 
   mutate(Position = factor(position,
                            levels = c("nap_time","upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
@@ -546,7 +545,7 @@ After the distal comparison video ended, caregivers were instructed to keep the 
 
 Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger (A) and older infants (B). Predictions from the group model were used to ensure that motion data were classified consistently across all sessions. Session start times ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Although the equipment was always dropped off in the morning, sometimes infants were unexpectedly asleep, leading to a few sessions in which infants began wearing the sensors later than intended (such as \#11 in the younger group). With two exceptions, recordings lasted until the infants' bed time. Older participant \#1 had the equipment picked up on the same day rather than the next day, so the recording ended at 17:00. Older participant \#11 wore the equipment in the morning, but the family left the house at 10:15 and remained out for the rest of the day, choosing not to put the equipment back on when they returned home in the late afternoon. Among those participants who wore the equipment until bedtime, recordings ended between `r end_times[1]` and `r end_times[length(end_times)]` with a median of `r end_times[floor(length(end_times)/2)]`. 
 
-Among participants who wore the sensors from morning to bedtime, the majority of the time during the day either resulted in usable body position data or was excluded due to caregiver-reported naps (gray periods in Figure \@ref(fig:timelines)). The total length of the recording period ranged from `r apa_num(min(coverage$total))`-`r apa_num(max(coverage$total))` hours with a median of `r apa_num(median(coverage$total))` hours. Nap times reported during the recording period ranged from `r apa_num(min(coverage$naptime))`-`r apa_num(max(coverage$naptime))` hours with a median of `r apa_num(median(coverage$naptime))` hours. Body position data was available to describe `r apa_num(min(coverage$prop_accounted)*100, digits = 1)`-`r apa_num(max(coverage$prop_accounted)*100, digits = 1)`% of the awake portion of the recording period (median = `r apa_num(median(coverage$prop_accounted)*100, digits = 1)`%). Younger infant \#13 had the least portion of the waking day accounted for; the family left the house to run errands during the majority of the recording period, and the infant napped during much of the remaining time at home. Overall, the recordings produced a median of `r apa_num(median(coverage$hours_recorded))` hours of motion data, with the entire dataset totaling `r apa_num(sum(coverage$hours_recorded))` hours. Even the shortest full recording (`r apa_num(min(coverage$hours_recorded))` hours) exceeded the longest observational sessions in past work in which an experimenter operated a camera. 
+Among participants who wore the sensors from morning to bedtime, the majority of the time during the day either resulted in usable body position data or was excluded due to caregiver-reported naps (gray periods in Figure \@ref(fig:timelines)). The total length of the recording period ranged from `r apa_num(min(coverage$total))`-`r apa_num(max(coverage$total))` hours with a median of `r apa_num(median(coverage$total))` hours. Nap times reported during the recording period ranged from `r apa_num(min(coverage$naptime))`-`r apa_num(max(coverage$naptime))` hours with a median of `r apa_num(median(coverage$naptime))` hours. Body position data was available to describe `r apa_num(min(coverage$prop_accounted)*100, digits = 1)`-`r apa_num(max(coverage$prop_accounted)*100, digits = 1)`% of the awake portion of the recording period (median = `r apa_num(median(coverage$prop_accounted)*100, digits = 1)`%). Younger infant \#14 had the least portion of the waking day accounted for; the family left the house to run errands during the majority of the recording period, and the infant napped during much of the remaining time at home. Overall, the recordings produced a median of `r apa_num(median(coverage$hours_recorded))` hours of motion data, with the entire dataset totaling `r apa_num(sum(coverage$hours_recorded))` hours. Even the shortest full recording (`r apa_num(min(coverage$hours_recorded))` hours) exceeded the longest observational sessions in past work in which an experimenter operated a camera. 
 
 Considering that body position annotation takes 2-5 hours of labor per 1 hour of behavior, the `r round(sum(coverage$hours_recorded))` hours of data we recorded would have taken `r round(sum(coverage$hours_recorded)*2)`-`r round(sum(coverage$hours_recorded)*5)` hours of labor to annotate from video. However, only an estimated `r round(nrow(coverage)*2)`-`r round(nrow(coverage)*5)` hours of labor was needed to annotate the initial hour of each session's video that was used to train the machine learning models---an immense savings in the human cost of annotation that allows the method to scale to larger sample sizes and recording durations.
 <!-- CITES -->
@@ -556,13 +555,13 @@ Considering that body position annotation takes 2-5 hours of labor per 1 hour of
 fullday_group <- read_csv("data/imu-compiled.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
-         nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
-  filter(id_uni != 10401)
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) 
+
 fullday_split <- read_csv("data/imu-compiled-split.csv") %>% 
   mutate(id_uni = factor(id*100+session),
          group = factor(ifelse(age <= 8, "Younger", "Older")),
-         nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
-  filter(id_uni != 10401)
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) 
+
 fullday <- list("group" = fullday_group, "split" = fullday_split)
 
 fullday_long <- function(ds) {
