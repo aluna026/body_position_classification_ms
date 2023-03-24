@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  16 MAR 2023 15:07
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  24 MAR 2023 12:36
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -654,11 +654,11 @@ File: manuscript_files/figure-latex/metrics-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/metrics-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/metrics-1.pdf  used on input line 15.
 (pdftex.def)             Requested size: 400.5136pt x 178.67523pt.
-<manuscript_files/figure-latex/part2overall-1.pdf, id=432, 487.8225pt x 448.67625pt>
+<manuscript_files/figure-latex/part2overall-1.pdf, id=432, 495.8525pt x 449.68pt>
 File: manuscript_files/figure-latex/part2overall-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2overall-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/part2overall-1.pdf  used on input line 25.
-(pdftex.def)             Requested size: 469.76321pt x 432.06618pt.
+(pdftex.def)             Requested size: 469.75583pt x 426.01338pt.
 <manuscript_files/figure-latex/part2bins-1.pdf, id=433, 558.085pt x 287.0725pt>
 File: manuscript_files/figure-latex/part2bins-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2bins-1.pdf>
@@ -689,7 +689,7 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  77i,12n,81p,2453b,620s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb>
-Output written on manuscript.pdf (56 pages, 500224 bytes).
+Output written on manuscript.pdf (56 pages, 500252 bytes).
 PDF statistics:
  669 PDF objects out of 1000 (max. 8388607)
  580 compressed objects within 6 object streams
