@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  27 MAR 2023 08:37
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  27 MAR 2023 09:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -634,37 +634,37 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 216.
 (/Users/johnfranchak/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [4] [5] [6] [7] [8] [9] [10] [11] [12]
+) [4] [5] [6] [7] [8] [9] [10] [11] [12] [13]
 \openout4 = `manuscript.fff'.
 
-(manuscript.fff) [13] [14] [15] [16] [17] [18]
+(manuscript.fff) [14] [15] [16] [17] [18]
 \openout3 = `manuscript.ttt'.
 
 (manuscript.ttt) [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37] [38] [39] [40] [41] [42] [43] AED endfloat: Processing end Figures and Tables [44] (./manuscript.ttt) [45
 
 
 ] [46] [47] [48] [49] (./manuscript.fff
-<figures/timeline.png, id=425, 902.1705pt x 557.6835pt>
+<figures/timeline.png, id=424, 902.1705pt x 557.6835pt>
 File: figures/timeline.png Graphic file (type png)
 <use figures/timeline.png>
 Package pdftex.def Info: figures/timeline.png  used on input line 5.
 (pdftex.def)             Requested size: 465.05663pt x 287.47826pt.
-<manuscript_files/figure-latex/metrics-1.pdf, id=426, 400.49625pt x 178.6675pt>
+<manuscript_files/figure-latex/metrics-1.pdf, id=425, 400.49625pt x 178.6675pt>
 File: manuscript_files/figure-latex/metrics-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/metrics-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/metrics-1.pdf  used on input line 15.
 (pdftex.def)             Requested size: 400.5136pt x 178.67523pt.
-<manuscript_files/figure-latex/part2overall-1.pdf, id=427, 487.8225pt x 448.67625pt>
+<manuscript_files/figure-latex/part2overall-1.pdf, id=426, 487.8225pt x 448.67625pt>
 File: manuscript_files/figure-latex/part2overall-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2overall-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/part2overall-1.pdf  used on input line 25.
 (pdftex.def)             Requested size: 469.76321pt x 432.06618pt.
-<manuscript_files/figure-latex/part2bins-1.pdf, id=428, 558.085pt x 287.0725pt>
+<manuscript_files/figure-latex/part2bins-1.pdf, id=427, 558.085pt x 287.0725pt>
 File: manuscript_files/figure-latex/part2bins-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2bins-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/part2bins-1.pdf  used on input line 35.
 (pdftex.def)             Requested size: 469.76752pt x 241.64299pt.
-<manuscript_files/figure-latex/timelines-1.pdf, id=429, 507.8975pt x 551.05875pt>
+<manuscript_files/figure-latex/timelines-1.pdf, id=428, 507.8975pt x 551.05875pt>
 File: manuscript_files/figure-latex/timelines-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/timelines-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/timelines-1.pdf  used on input line 45.
@@ -672,7 +672,7 @@ Package pdftex.def Info: manuscript_files/figure-latex/timelines-1.pdf  used on 
 
 LaTeX Warning: Float too large for page by 37.24847pt on input line 50.
 
-<manuscript_files/figure-latex/age-1.pdf, id=430, 523.9575pt x 485.815pt>
+<manuscript_files/figure-latex/age-1.pdf, id=429, 523.9575pt x 485.815pt>
 File: manuscript_files/figure-latex/age-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/age-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/age-1.pdf  used on input line 55.
@@ -689,10 +689,10 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  77i,12n,81p,2447b,620s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb>
-Output written on manuscript.pdf (55 pages, 502177 bytes).
+Output written on manuscript.pdf (55 pages, 502266 bytes).
 PDF statistics:
- 663 PDF objects out of 1000 (max. 8388607)
- 575 compressed objects within 6 object streams
+ 662 PDF objects out of 1000 (max. 8388607)
+ 574 compressed objects within 6 object streams
  197 named destinations out of 1000 (max. 500000)
  271 words of extra memory for PDF output out of 10000 (max. 10000000)
 
