@@ -24,7 +24,7 @@ abstract: |
   Long form audio recordings have had a transformational effect on the study of infant language acquisition by using mobile, unobtrusive devices to gather full-day, real-time data that can be automatically scored. How can we produce similar data in service of measuring infants' everyday motor behaviors, such as body position? The aim of the current study was to validate long form recordings of infant position (supine, prone, sitting, upright, held by caregiver) based on machine learning classification of data from inertial sensors worn on infants' ankles and hips. Using over 100 hours of video recordings synchronized with inertial sensor data from infants in their homes, we demonstrate that body position classifications are sufficiently accurate to measure infant behavior. Moreover, classification remained accurate when predicting behavior later in the session when infants and caregivers were unsupervised and went about their normal activities, showing that the method can handle the challenge of measuring unconstrained, natural activity. Next, we show that the inertial sensing method has convergent validity by replicating age differences in body position found using other methods with full-day data captured from inertial sensors. We end the paper with a discussion of the novel opportunities that long form motor recordings afford for understanding infant learning and development.
   
 keywords          : "body position, motor development, everyday experiences, sitting, machine learning"
-wordcount         : "12,030"
+wordcount         : "12,022"
 
 bibliography      : "master.bib"
 
@@ -57,7 +57,6 @@ library(rstatix)
 ```
 
 ```{r analysis-preferences}
-# Seed for random number generation
 set.seed(42)
 knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
 pos_levels <- c("Supine", "Prone", "Sitting", "Upright", "Held")
@@ -168,7 +167,6 @@ Because the camera only had the battery life to record for ~3 hours (split into 
 ## Body Position Annotation
 
 The proximal and distal comparison videos for each participant were annotated by trained human coders to identify infant *body position* into one of 5 mutually-exclusive categories following the definitions in prior work [@FranchakScott2021]: supine, prone, sitting, upright, or held by caregiver. All coding was done using Datavyu software (datavyu.org). A Databrary repository contains the entire video recording, coding files, and raw IMU data for a single participant (https://nyu.databrary.org/volume/1580).
-<!-- CODE OCEAN HERE -->
 
 Supine was coded when the infant was lying on their back or was reclined up to a 45 degree angle. Supine was also coded in the rare cases when the infant was laying on their side. Prone was coded when the infant was lying on their stomach, was stationary supported by the hands/knees or the hands/feet, or was crawling. We scored sitting to include any form of the following seated positions: 1) infants sat with their buttocks on a surface, such as on the floor or a caregiver’s lap, 2) infant was in a kneeling-sit position, in which their knees were on the ground with their legs tucked underneath the buttocks, and 3) infant was in a seating device, such as a high chair, that kept the torso oriented perpendicular to the ground (a reclined position, such as in a young infant's car seat, would be counted as supine). Upright was coded when the infant was standing or squatting on the ground with two feet or walking (regardless of whether infants' balance was assisted by a caregiver or with their hands holding onto something for support). When an infant was carried by a caregiver, held was coded. However, when the caregiver was sitting with the infant in their lap the infant’s body position was coded as if the caregiver was a surface (e.g., if the infant was sitting on the caregiver’s lap this was coded as sitting). Times during the video when the infant was out of view were excluded. Periods when the sensor garment was adjusted or taken off the infant were also excluded, as were transitions between body positions. 
 
@@ -177,7 +175,6 @@ A primary coder completed annotation for the full length of the video, while an 
 ## Body Position Classification
 
 The same machine learning classification process was used as in prior work [@FranchakScott2021]. Using the synchronization point, human-coded body annotations from video were linked to the corresponding times in the IMU time series data. A single, merged dataset was created with synchronized accelerometer signals (in three orientations: X, Y, and Z) and gyroscope signals (in three orientations: roll, pitch, and yaw) for each of the four sensors (left hip, right hip, left ankle, right ankle) with the corresponding timestamp and body position code using the *timetk* package [@DanchoVaughan2023] and the *lubridate* package [@GrolemundWickham2011] in R version 4.1.2 [@R42].
-<!-- CODE OCEAN HERE -->
 
 Classification training and prediction was conducted on a windowed dataset that summarized the raw, 62.5 Hz motion signals within 4-s windows. Overlapping moving windows captured 4-s (250 samples) of data starting each second, which is a common unit of analysis in prior studies of human activity classification [@FranchakScott2021; @NamPark2013; @AiraksinenRasanen2020]. The 250 samples of data in each window were aggregated into a variety of motion features---summary statistics that could be fed into the machine learning model. The minimum, maximum, 25th percentile, 75th percentile, mean, median, skew, kurtosis, standard deviation, and sum were computed for each signal (e.g., right hip X linear acceleration, left ankle pitch angular acceleration). The 10 summary statistics and 24 sensor signals generated 240 columns of motion features that described movement within each window. Furthermore, a series of cross-sensor and cross-orientation summaries (such as the correlation, magnitude, and difference between pairs of sensors) added an additional 196 columns of motion features. The 436 total motion features corresponded to a single body annotation code for each 4-s window. Windows were only used for training/testing if they contained a single body position for > 75% (3 s) of time within the window to ensure that motion signals could be linked to an unambiguous example of each behavior.
 
@@ -185,8 +182,7 @@ The resulting windowed dataset was used for machine learning classification and 
 
 ## Data Sharing and Transparency
 
-Three online repositories contain openly shared data, materials, and analysis code. A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (LINK) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". The chosen participant's classification accuracy was at the median level. Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (LINK) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method (described in the results below), along with the processed intermediary files used for each set of analyses. This reproducible manuscript created in RMarkdown and *papaja* [@papaja] is generated from those data files for computational transparency.
-<!-- FINAL LINKS -->
+Three online repositories contain openly shared data, materials, and analysis code. A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_ms.git) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". The chosen participant's classification accuracy was at the median level. Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms.git) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method (described in the results below), along with the processed intermediary files used for each set of analyses. This reproducible manuscript created in RMarkdown and *papaja* [@papaja] can be regenerated from those data files for full computational transparency.
 
 # Results
 
@@ -584,12 +580,6 @@ age_plots <- map(fullday, fullday_long) %>% map(age_scatter)
 age_plots <- map2(age_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
 age_plots[[1]] + age_plots[[2]]
 
-# outlier_ids <- c(10701, 10401, 10601)
-# fullday %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
-# fullday %>% filter(!(id_uni %in% outlier_ids)) %>% cor_mat(age, sit_time:upright_time) %>% cor_mark_significant()
-# 
-# fullday_long %>% group_by(position, group) %>% get_summary_stats(prop)
-
 ```
 
 ```{r agetable, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
@@ -678,21 +668,23 @@ In the past decade, developmental scientists have discovered that distributional
 Moreover, real-time recording of motor behavior provides a way to measure how infant motor behavior links to other types of experiences in the moment in daily life. As we reviewed, @MalachowskiSalo2023 used a combination of LENA&reg; and EMA surveys to find that infants heard less adult speech when restrained in seating devices. Combining LENA&reg; and long-form motor recordings can take this a step further by measuring more precisely how speech and body position co-vary within a day. Synchronizing long form motor recordings to other continuous monitors, such as wearable ECG [@WassPhillips2022] can provide information about how infant arousal relates to motor behavior. "TotTag"---a wearable device for measuring infant-caregiver distance [@SaloPannuto2022]---or caregiver worn activity trackers/physiology monitors could be paired with body position classification to better understand how moment-to-moment interpersonal dynamics relate to infant motor behavior.
 
 What underpins these novel research applications is that body position classifications can be applied automatically at scale. Annotating a video corpus of infant behavior from a moderately sized sample---such as 40 infants recorded for 2 hours each in 2 separate visits [@HerzbergFletcher2021]---is incredibly labor intensive. Annotating a larger, more representative sample of *hundreds of infants* while simultaneously scoring *full-day data* would be prohibitive. With sufficiently accurate group models, researchers could annotate a moderately-sized video corpus to then apply the model to hundreds of full-day recordings. Unlike with video, the added cost of more IMU sensor recording time is low, meaning that future studies could sample across multiple days of behavior to better understand intra- versus inter-day variability. Prior diary methods show that infants inconsistently display new motor skills on a day-to-day basis [@AdolphRobinson2008; @AdolphRobinson2011]. Multi-day recordings could further uncover how infants' experiences vary over timescales from seconds to days. 
-<!-- More easily shareable data (non-identifiable, text based) -->
 
 ## Limitations
 
 We acknowledge several limitations in the current approach. First, a stronger test of full-day accuracy would be to compare accuracy at the start of the recording period to accuracy at the end, rather than using the distal comparison video that followed the first 90 minutes of the study. As we described in the procedure section, synchronizing video cameras and inertial sensors required capturing a synchronization point on video. We completed this procedure prior to giving equipment to caregivers so that they were not responsible for synchronization; in fact, caregivers never (purposefully) touched a button on the video camera. An end-of-day video would require a lot of effort and compliance on the part of caregivers, and any mistakes in the procedure would lead to misaligned and unusable data. Given that most recordings ended at infants' bedtimes, having an experimenter visit families in the evening to video record would be intrusive.
 
 Second, we relied on caregiver logs of infants' naps and times when sensors were removed to separate usable data (times when infants wore the sensors while awake) from unusable data. Although most caregivers were diligent about completing logs, there were a few cases that caregivers may have failed to report naps (younger infants \#1 and \#4). In the future, algorithms can be developed to automatically identify periods of sleep and times when sensors are off the body. Such algorithms exist for adults using wrist-worn sensors, however, we did not use them because they have not been validated for infant participants wearing sensors on hips/ankles. Differences in infants' positioning while asleep (held in caregivers arms, laying in cribs, reclined in strollers and carseats) might make classifying sleep more difficult compared with adults based on movement. 
-<!-- NEED SLEEP AND WEAR TIME CITES> -->
-<!-- Algorithms for infant sleep? -->
 
 Third, although the goal was to collect fully naturalistic behavior, we opted to restrict recording to times when participants were in the home. Inertial sensors can travel with participants, and there is no doubt that infants could have worn the sensors out of the home on errands. However, we do not yet have training data to detect periods of transportation (e.g., moving in a car or in a stroller) that might add noise and/or lead to misclassification of body positions. Future work should aim to collect data in these scenarios so that body position can be captured in or out of the home.
 
 ## Conclusions
 
 In summary, the current study demonstrates the validity of long-form recordings of infant motor behavior in the home. Our analyses show that body position classifications---whether infants are supine, prone, sitting, upright, or held---are accurate immediately and even following a substantial delay. Most important, we find substantial agreement between human-coded and model-predicted body position for data collected during truly everyday, unsupervised activities that create the most challenging cases for automatic classification. In most cases, model prediction accuracy approached human reliability, suggesting that model predictions can be confidently used in analyses of full-day infant behavior. Examining the resulting corpus of > 200 hours of real-time infant body position showed the feasibility of capturing data covering the majority of infants' awake time and the variety of activities contained therein. A rudimentary analysis of aggregated data showed that full-day position estimates conformed to expectations about age differences in motor behavior. Future work employing the method can go beyond aggregated measures of behavior to uncover the temporal structure in infants' daily motor experiences. 
+
+```{r results="hide"}
+devtools::session_info() %>% jsonlite::write_json("session_info.json")
+```
+
 
 \newpage
 

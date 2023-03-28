@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  27 MAR 2023 15:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.3.2)  28 MAR 2023 09:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -644,27 +644,27 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 
 
 ] [48] [49] [50] [51] (./manuscript.fff
-<figures/timeline.png, id=438, 902.1705pt x 557.6835pt>
+<figures/timeline.png, id=440, 902.1705pt x 557.6835pt>
 File: figures/timeline.png Graphic file (type png)
 <use figures/timeline.png>
 Package pdftex.def Info: figures/timeline.png  used on input line 5.
 (pdftex.def)             Requested size: 465.05663pt x 287.47826pt.
-<manuscript_files/figure-latex/metrics-1.pdf, id=439, 400.49625pt x 178.6675pt>
+<manuscript_files/figure-latex/metrics-1.pdf, id=441, 400.49625pt x 178.6675pt>
 File: manuscript_files/figure-latex/metrics-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/metrics-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/metrics-1.pdf  used on input line 15.
 (pdftex.def)             Requested size: 400.5136pt x 178.67523pt.
-<manuscript_files/figure-latex/part2overall-1.pdf, id=440, 487.8225pt x 448.67625pt>
+<manuscript_files/figure-latex/part2overall-1.pdf, id=442, 487.8225pt x 448.67625pt>
 File: manuscript_files/figure-latex/part2overall-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2overall-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/part2overall-1.pdf  used on input line 25.
 (pdftex.def)             Requested size: 469.76321pt x 432.06618pt.
-<manuscript_files/figure-latex/part2bins-1.pdf, id=441, 558.085pt x 287.0725pt>
+<manuscript_files/figure-latex/part2bins-1.pdf, id=443, 558.085pt x 287.0725pt>
 File: manuscript_files/figure-latex/part2bins-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/part2bins-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/part2bins-1.pdf  used on input line 35.
 (pdftex.def)             Requested size: 469.76752pt x 241.64299pt.
-<manuscript_files/figure-latex/timelines-1.pdf, id=442, 507.8975pt x 551.05875pt>
+<manuscript_files/figure-latex/timelines-1.pdf, id=444, 507.8975pt x 551.05875pt>
 File: manuscript_files/figure-latex/timelines-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/timelines-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/timelines-1.pdf  used on input line 45.
@@ -672,7 +672,7 @@ Package pdftex.def Info: manuscript_files/figure-latex/timelines-1.pdf  used on 
 
 LaTeX Warning: Float too large for page by 37.24847pt on input line 50.
 
-<manuscript_files/figure-latex/age-1.pdf, id=443, 523.9575pt x 485.815pt>
+<manuscript_files/figure-latex/age-1.pdf, id=445, 523.9575pt x 485.815pt>
 File: manuscript_files/figure-latex/age-1.pdf Graphic file (type pdf)
 <use manuscript_files/figure-latex/age-1.pdf>
 Package pdftex.def Info: manuscript_files/figure-latex/age-1.pdf  used on input line 55.
@@ -689,10 +689,10 @@ Here is how much of TeX's memory you used:
  14 hyphenation exceptions out of 8191
  77i,12n,81p,2415b,620s stack positions out of 10000i,1000n,20000p,200000b,200000s
 {/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/johnfranchak/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri12.pfb>
-Output written on manuscript.pdf (57 pages, 506774 bytes).
+Output written on manuscript.pdf (57 pages, 507005 bytes).
 PDF statistics:
- 680 PDF objects out of 1000 (max. 8388607)
- 590 compressed objects within 6 object streams
+ 682 PDF objects out of 1000 (max. 8388607)
+ 592 compressed objects within 6 object streams
  203 named destinations out of 1000 (max. 500000)
  279 words of extra memory for PDF output out of 10000 (max. 10000000)
 
