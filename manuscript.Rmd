@@ -18,13 +18,13 @@ author:
 authornote: |
   We are grateful to Vanessa Scott, Tasnia Haider, and Ishapreet Kaur for their help in collecting data for the present study and to the research assistants of the UCR Perception, Action, and Development Lab for annotating videos.
 
-  This work was funded by National Science Foundation Grant BCS #1941449 to the first author.
+  This work was funded by National Science Foundation Grant BCS #1941449 to the first author. The authors declare no conflict of interest.
 
 abstract: |
   Long form audio recordings have had a transformational effect on the study of infant language acquisition by using mobile, unobtrusive devices to gather full-day, real-time data that can be automatically scored. How can we produce similar data in service of measuring infants' everyday motor behaviors, such as body position? The aim of the current study was to validate long form recordings of infant position (supine, prone, sitting, upright, held by caregiver) based on machine learning classification of data from inertial sensors worn on infants' ankles and hips. Using over 100 hours of video recordings synchronized with inertial sensor data from infants in their homes, we demonstrate that body position classifications are sufficiently accurate to measure infant behavior. Moreover, classification remained accurate when predicting behavior later in the session when infants and caregivers were unsupervised and went about their normal activities, showing that the method can handle the challenge of measuring unconstrained, natural activity. Next, we show that the inertial sensing method has convergent validity by replicating age differences in body position found using other methods with full-day data captured from inertial sensors. We end the paper with a discussion of the novel opportunities that long form motor recordings afford for understanding infant learning and development.
   
 keywords          : "body position, motor development, everyday experiences, sitting, machine learning"
-wordcount         : "12,022"
+wordcount         : "11,995"
 
 bibliography      : "master.bib"
 
@@ -182,7 +182,7 @@ The resulting windowed dataset was used for machine learning classification and 
 
 ## Data Sharing and Transparency
 
-Three online repositories contain openly shared data, materials, and analysis code. A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_ms.git) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". The chosen participant's classification accuracy was at the median level. Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms.git) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method (described in the results below), along with the processed intermediary files used for each set of analyses. This reproducible manuscript created in RMarkdown and *papaja* [@papaja] can be regenerated from those data files for full computational transparency.
+Three online repositories contain openly shared data, materials, and analysis code. A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_example) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method. This reproducible manuscript created in RMarkdown and *papaja* [@papaja] can be regenerated from those data files for full computational transparency.
 
 # Results
 
@@ -682,7 +682,7 @@ Third, although the goal was to collect fully naturalistic behavior, we opted to
 In summary, the current study demonstrates the validity of long-form recordings of infant motor behavior in the home. Our analyses show that body position classifications---whether infants are supine, prone, sitting, upright, or held---are accurate immediately and even following a substantial delay. Most important, we find substantial agreement between human-coded and model-predicted body position for data collected during truly everyday, unsupervised activities that create the most challenging cases for automatic classification. In most cases, model prediction accuracy approached human reliability, suggesting that model predictions can be confidently used in analyses of full-day infant behavior. Examining the resulting corpus of > 200 hours of real-time infant body position showed the feasibility of capturing data covering the majority of infants' awake time and the variety of activities contained therein. A rudimentary analysis of aggregated data showed that full-day position estimates conformed to expectations about age differences in motor behavior. Future work employing the method can go beyond aggregated measures of behavior to uncover the temporal structure in infants' daily motor experiences. 
 
 ```{r results="hide"}
-devtools::session_info() %>% jsonlite::write_json("session_info.json")
+writeLines(capture.output(devtools::session_info()), "session_info.txt")
 ```
 
 
