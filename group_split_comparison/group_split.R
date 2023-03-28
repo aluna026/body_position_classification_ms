@@ -1,13 +1,16 @@
+# This script calculates the first set of results in the paper based on the proximal period
+# compiled_data_lite.RData contains the windowed motion feature data for all sessions
+# The data are partitioned into training and testing sets
+# Group models and individual ("split") models are trained, and then predictions are made on the testing set
+# Agreement metrics are saved to /data to be reported in the RMarkdown manuscript
+# Depending on hardware, this script can take several hours to run
+
 library(here)
 library(randomForest)
 library(cvms)
 library(caret)
 library(tidyverse)
 library(rstatix)
-# library(furrr)
-# 
-# plan("multisession", workers = 4)
-# plan("sequential")
 
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
@@ -21,12 +24,10 @@ total_samples <- slide_filt %>% drop_na(code) %>% group_by(id) %>% summarize(n_s
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
 
-bad_ids <- c(9909, 10204, 12502, 9911, 10701, 10802, 12002, 9910, 11104, 12101, 11501, 11601)
-
-group_model <- function(temp_id, training, ntree = 50, bad_ids = NULL) {
+group_model <- function(temp_id, training, ntree = 50) {
   print(temp_id)
   temp_group_training <- training %>% 
-    filter(id != temp_id, !(id %in% bad_ids)) %>% 
+    filter(id != temp_id) %>% 
     select_if(not_all_na) %>% 
     mutate(code = fct_drop(code)) %>% 
     select(-id)
@@ -46,11 +47,7 @@ split_model <- function(temp_id, training, ntree = 50) {
 
 ids <- unique(training$id)
 group_mods <-map(ids, ~group_model(.x, training)) %>% set_names(ids)
-# group_select_mods <- map(ids, ~group_model(.x, training, bad_ids = bad_ids)) %>% set_names(ids)
 split_mods <- map(ids, ~split_model(.x, training)) %>% set_names(ids)
-
-# save(group_mods, split_mods, file = "group_split_comparison/models.RData")
-# load( here("group_split_comparison","models.RData"))
 
 metrics <- function(rfmodel, testing) {
   predictions <- predict(rfmodel, testing, type = "class")
@@ -63,18 +60,13 @@ res_group <- map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%
   add_column(ids) %>% add_column(model = "group")
 res_group %>% get_summary_stats(-ids)
 
-# res_select <- map2(group_select_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
-#   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
-#   add_column(ids) %>% add_column(model = "select")
-# res_select %>% get_summary_stats(-ids)
-
 res_split <- map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>% 
   map_dfr(~ select(.x, `Overall Accuracy`:Kappa)) %>% 
   add_column(ids) %>% add_column(model = "split")
 res_split %>% get_summary_stats(-ids)
 res_split %>% arrange(`Overall Accuracy`)
 
-ds <- bind_rows(res_split, res_group) # %>% bind_rows(res_select)
+ds <- bind_rows(res_split, res_group) 
 write_csv(ds, file = "data/group_split_metrics.csv")
 
 res_group_class <-  map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%  
@@ -88,10 +80,3 @@ res_split_class <-  map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y)
 
 ds_class <- bind_rows(res_split_class, res_group_class) 
 write_csv(ds_class, file = "data/group_split_metrics_class.csv")
-
-# ggplot(ds, aes(x = model, y = `Overall Accuracy`)) + geom_boxplot()
-# ggplot(ds, aes(x = model, y = `Balanced Accuracy`)) + geom_boxplot()
-# ggplot(ds, aes(x = model, y = `Kappa`)) + geom_boxplot()
-# 
-# ds %>% pivot_wider(id_cols = ids, names_from = model, values_from = `Overall Accuracy`) %>% 
-#   ggplot(aes(x = split, y = group)) + geom_point() + xlim(0,1) + ylim(0,1) + geom_abline(slope = 1, intercept = 0)
