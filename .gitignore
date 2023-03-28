@@ -36,6 +36,11 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 /figure-latex/
+manuscript.fff
+manuscript.log
+manuscript.ttt
+manuscript.docx
+
 
 # R Environment Variables
 .Renviron
