@@ -685,6 +685,31 @@ In summary, the current study demonstrates the validity of long-form recordings 
 writeLines(capture.output(devtools::session_info()), "session_info.txt")
 ```
 
+\newpage
+
+# Declarations
+
+## Funding 
+
+This work was funded by National Science Foundation Grant BCS #1941449.
+
+## Competing Interests 
+
+The authors have no competing interests to declare that are relevant to the content of this article.
+
+## Ethics Approval
+
+The study was performed in accordance with the ethical standards as laid down in the 1964 Declaration of Helsinki. The study procedures were approved by the Institutional Review Board of the University of California, Riverside, Protocol HS-15-050. 
+
+## Consent
+
+Consent to participate: All caregivers provided written informed consent prior to the start of the study. 
+Consent to publish: Additional written consent was obtained by caregivers for data sharing of audio and video data.
+
+## Data, Material and Code availability 
+
+A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_example) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method.
+
 
 \newpage
 
