@@ -413,6 +413,41 @@ As in past work \autocite{FranchakScott2021,AiraksinenRasanen2020}, all body pos
 
 Beyond accuracy, it is important to establish that classification is neither too sensitive nor too conservative in choosing one position versus another. Sensitivity refers to the proportion of events of a given position that were correctly identified (e.g., out of 100 human-coded sitting windows, how many of those windows did the model correctly classify as sitting?). High sensitivity means that events are unlikely to be missed. In contrast, positive predictive value (PPV) refers to the proportion of events classified for a given position that actually belonged to that position (e.g., if the model said a baby was upright during 100 windows, how many of those windows were indeed human-coded upright events?). High PPV means that we can be confident in the event label. Table \ref{tab:metrics-by-class} shows the sensitivity and PPV by body position class for group and individual models. For group models, sensitivity and PPV were similar: They were highest for supine, prone, and sitting (the most accurately identified class) and lowest for upright and held. Results for individual models were similar to group models, with the exception of a somewhat lower sensitivity score for held. Overall, the results suggest a reasonable balance between sensitivity and PPV among different body position classes for both model types. Table \ref{tab:metrics-table} shows the overall sensitivity and PPV across classes.
 
+\hypertarget{sensor-configuration}{%
+\subsubsection{Sensor Configuration}\label{sensor-configuration}}
+
+\begin{table}[tbp]
+
+\begin{center}
+\begin{threeparttable}
+
+\caption{\label{tab:metrics-reduce}Median, mean, and SD of overall accuracy calculated with different sets of sensor features. The top row shows performance using all features calculated from the four sensors. Rows 2-5 show accuracy using pairs of sensors (left hip and ankle, right hip and ankle, left and right hip, left and right ankle), and rows 6-9 show accuracy using each individual sensor.}
+
+\begin{tabular}{lllllll}
+\toprule
+ & \multicolumn{3}{c}{Group} & \multicolumn{3}{c}{Individual} \\
+\cmidrule(r){2-4} \cmidrule(r){5-7}
+Sensors & Median & Mean & SD & Median & Mean & SD\\
+\midrule
+All & 0.894 & 0.846 & 0.131 & 0.933 & 0.916 & 0.072\\ \midrule
+Left Hip/Ankle & 0.891 & 0.824 & 0.177 & 0.915 & 0.901 & 0.071\\
+Right Hip/Ankle & 0.842 & 0.800 & 0.167 & 0.897 & 0.898 & 0.086\\
+Both Hips & 0.859 & 0.791 & 0.195 & 0.907 & 0.898 & 0.072\\
+Both Ankles & 0.797 & 0.719 & 0.196 & 0.864 & 0.844 & 0.108\\ \midrule
+Left Hip & 0.842 & 0.762 & 0.208 & 0.889 & 0.872 & 0.077\\
+Left Ankle & 0.717 & 0.667 & 0.208 & 0.851 & 0.825 & 0.117\\
+Right Hip & 0.846 & 0.772 & 0.178 & 0.896 & 0.876 & 0.092\\
+Right Ankle & 0.704 & 0.683 & 0.160 & 0.830 & 0.819 & 0.114\\
+\bottomrule
+\end{tabular}
+
+\end{threeparttable}
+\end{center}
+
+\end{table}
+
+\renewcommand{\arraystretch}{.75}
+
 \hypertarget{measure-the-distal-accuracy-of-body-position-classification-models}{%
 \subsection{Measure the Distal Accuracy of Body Position Classification Models}\label{measure-the-distal-accuracy-of-body-position-classification-models}}
 

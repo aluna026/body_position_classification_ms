@@ -1,5 +1,5 @@
 names,left_ankle_only,right_ankle_only,left_hip_only,right_hip_only,left_side,right_side,ankles,hips
-code,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE
+code,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE
 laacc_x_M,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE
 laacc_x_SD,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE
 laacc_x_MED,TRUE,FALSE,FALSE,FALSE,TRUE,FALSE,TRUE,FALSE

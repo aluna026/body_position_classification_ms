@@ -301,6 +301,37 @@ As in past work [@FranchakScott2021; @AiraksinenRasanen2020], all body positions
 
 Beyond accuracy, it is important to establish that classification is neither too sensitive nor too conservative in choosing one position versus another. Sensitivity refers to the proportion of events of a given position that were correctly identified (e.g., out of 100 human-coded sitting windows, how many of those windows did the model correctly classify as sitting?). High sensitivity means that events are unlikely to be missed. In contrast, positive predictive value (PPV) refers to the proportion of events classified for a given position that actually belonged to that position (e.g., if the model said a baby was upright during 100 windows, how many of those windows were indeed human-coded upright events?). High PPV means that we can be confident in the event label. Table \@ref(tab:metrics-by-class) shows the sensitivity and PPV by body position class for group and individual models. For group models, sensitivity and PPV were similar: They were highest for supine, prone, and sitting (the most accurately identified class) and lowest for upright and held. Results for individual models were similar to group models, with the exception of a somewhat lower sensitivity score for held. Overall, the results suggest a reasonable balance between sensitivity and PPV among different body position classes for both model types. Table \@ref(tab:metrics-table) shows the overall sensitivity and PPV across classes.
 
+### Sensor Configuration
+<!-- data/reduce, duplicates of the group_split metrics but performed on reductions of sensor features from group_split_sensor_reduce.R -->
+
+```{r metrics-reduce, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+all_files = list.files("data/reduce", full.names = T, pattern = ".csv")
+overall_files = all_files %>% discard(str_detect(., pattern = "class"))
+sensor_comp <- read_csv(overall_files, id = "type")
+sensor_comp <- sensor_comp %>% mutate(type = str_remove(type, "data/reduce/reduce_metrics_"),
+                              type = str_remove(type, ".csv"),
+                              type = factor(type,
+                              levels = c("all", "left_side", "right_side", "hips", "ankles",
+                                         "left_hip","left_ankle", "right_hip", "right_ankle"),
+                              labels = c("All", "Left Hip/Ankle", "Right Hip/Ankle", "Both Hips", "Both Ankles", 
+                                         "Left Hip", "Left Ankle", "Right Hip", "Right Ankle")),
+                              Model = factor(model, levels = c("group", "split", labels = c("Group", "Individual")))) 
+
+metrics_sensor <- sensor_comp %>% group_by(Model, type) %>% 
+  get_summary_stats(`Overall Accuracy`) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  relocate(mean_group, .after = median_group) %>% 
+  relocate(sd_group, .after = mean_group) %>% 
+  mutate(across(-type, ~ apa_num(.x, digits = 3)))
+ 
+apa_table(metrics_sensor, col.names = c("Sensors", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)), midrules = c(1,5),
+          caption = "Median, mean, and SD of overall accuracy calculated with different sets of sensor features. The top row shows performance using all features calculated from the four sensors. Rows 2-5 show accuracy using pairs of sensors (left hip and ankle, right hip and ankle, left and right hip, left and right ankle), and rows 6-9 show accuracy using each individual sensor.")
+```
+
+\renewcommand{\arraystretch}{.75}
+
+
 ## Measure the Distal Accuracy of Body Position Classification Models
 
 <!-- compiled_agreement, generated from analysis-part2 -->
