@@ -12,17 +12,33 @@ library(caret)
 library(tidyverse)
 library(rstatix)
 
+feature_list <- read_csv("group_split_comparison/feature_names.csv")
+
+ reduce_type <- "left_side"
+# reduce_type <- "right_side"
+# reduce_type <- "left_ankle"
+# reduce_type <- "right_ankle"
+# reduce_type <- "left_hip"
+# reduce_type <- "right_hip"
+
 #LOAD DATA
 load( here("group_split_comparison","compiled_data_lite.RData"))
 ntree = 550
 mtry = 44
 not_all_na <- function(x) any(!is.na(x))
 
-total_time <- session %>% mutate(coded_time = end_time_coded - start_time_coded) %>% arrange(coded_time)
-total_samples <- slide_filt %>% drop_na(code) %>% group_by(id) %>% summarize(n_samples = n()) %>% arrange(n_samples)
-
 training <- slide_filt %>% group_by(id, code) %>% slice_head(prop = .75) %>% ungroup 
 testing <- slide_filt %>% group_by(id, code) %>% slice_tail(prop = .25) %>% ungroup
+
+
+if (reduce_type == "left_side")   reduce_names <- feature_list %>% filter(left_side == T) %>% pull(names)
+if (reduce_type == "right_side")  reduce_names <- feature_list %>% filter(right_side == T) %>% pull(names)
+if (reduce_type == "left_ankle")  reduce_names <- feature_list %>% filter(left_ankle_only == T) %>% pull(names)
+if (reduce_type == "right_ankle") reduce_names <- feature_list %>% filter(right_ankle_only == T) %>% pull(names)
+if (reduce_type == "left_hip")    reduce_names <- feature_list %>% filter(left_hip_only == T) %>% pull(names)
+if (reduce_type == "right_hip")   reduce_names <- feature_list %>% filter(right_hip_only == T) %>% pull(names)
+      
+training <- training %>% select(id, all_of(reduce_names))
 
 group_model <- function(temp_id, training, ntree = 50) {
   print(temp_id)
@@ -67,7 +83,7 @@ res_split %>% get_summary_stats(-ids)
 res_split %>% arrange(`Overall Accuracy`)
 
 ds <- bind_rows(res_split, res_group) 
-write_csv(ds, file = "data/group_split_metrics.csv")
+write_csv(ds, file = str_glue("data/reduce/reduce_metrics{reduce_type}.csv"))
 
 res_group_class <-  map2(group_mods, ids, ~metrics(.x, filter(testing, id == .y))) %>%  
   map2_dfr(ids, ~ .x$`Class Level Results`[[1]] %>% 
@@ -79,4 +95,4 @@ res_split_class <-  map2(split_mods, ids, ~metrics(.x, filter(testing, id == .y)
              mutate(id = .y, model = "split"))
 
 ds_class <- bind_rows(res_split_class, res_group_class) 
-write_csv(ds_class, file = "data/group_split_metrics_class.csv")
+write_csv(ds_class, file =  str_glue("data/reduce/reduce_metrics{reduce_type}_class.csv"))
