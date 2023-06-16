@@ -1,14 +1,14 @@
 - Session info ---------------------------------------------------------------
  setting  value
  version  R version 4.1.2 (2021-11-01)
- os       macOS Monterey 12.6.3
+ os       macOS Monterey 12.6.6
  system   aarch64, darwin20
  ui       X11
  language (EN)
  collate  en_US.UTF-8
  ctype    en_US.UTF-8
  tz       America/Los_Angeles
- date     2023-06-14
+ date     2023-06-15
  pandoc   2.19.2 @ /Applications/RStudio.app/Contents/Resources/app/quarto/bin/tools/ (via rmarkdown)
 
 - Packages -------------------------------------------------------------------
