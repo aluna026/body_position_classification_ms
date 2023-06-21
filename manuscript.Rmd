@@ -745,7 +745,7 @@ A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemp
 
 \newpage
 
-# References
+<!-- # References -->
 
 ::: {#refs custom-style="Bibliography"}
 :::
