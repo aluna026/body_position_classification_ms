@@ -1,4 +1,4 @@
-# Body Position Classification
+# Infant Body Position Classification
 
 This repository contains the data and code in support of the manuscript "Long-form recording of infant body position in the home using wearable inertial sensors". There are two main pieces. 
 
@@ -10,4 +10,4 @@ Session_Info.txt contains the R version and package versions required to reprodu
 
 Please cite the publication of record if you use data or code in your own project. The best current citation for this work is:
 
-Franchak, J. M., Tang, M., Rousey, H., & Luo, C. (2023). Long-form recording of infant body position in the home using wearable inertial sensors. Manuscript under review. 
+Franchak, J. M., Tang, M., Rousey, H., & Luo, C. Long-form recording of infant body position in the home using wearable inertial sensors. Manuscript to appear in *Behavior Research Methods*. 
