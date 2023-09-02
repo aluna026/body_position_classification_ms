@@ -11,3 +11,5 @@ Session_Info.txt contains the R version and package versions required to reprodu
 Please cite the publication of record if you use data or code in your own project. The best current citation for this work is:
 
 Franchak, J. M., Tang, M., Rousey, H., & Luo, C. Long-form recording of infant body position in the home using wearable inertial sensors. Manuscript to appear in *Behavior Research Methods*. 
+
+The manuscript contains links to other data sources and example participant data: https://padlab.ucr.edu/2024-FranchakTangRouseyLuo-BRM.pdf
