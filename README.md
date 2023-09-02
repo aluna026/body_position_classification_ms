@@ -1,4 +1,5 @@
 # Infant Body Position Classification
+[![DOI](https://zenodo.org/badge/600120718.svg)](https://zenodo.org/badge/latestdoi/600120718)
 
 This repository contains the data and code in support of the manuscript "Long-form recording of infant body position in the home using wearable inertial sensors". There are two main pieces. 
 
