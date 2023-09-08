@@ -1,0 +1,751 @@
+---
+title             : "Long-form recording of infant body position in the home using wearable inertial sensors"
+shorttitle        : "Infant position in the home"
+
+author: 
+  - name          : "John M. Franchak"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : "UC Riverside Department of Psychology, 900 University Avenue, Riverside, CA 92521"
+    email         : "franchak@ucr.edu"
+  - name          : "Maximilian Tang"
+    affiliation   : "1"
+  - name          : "Hailey Rousey"
+    affiliation   : "1"
+  - name          : "Chuan Luo"
+    affiliation   : "1"
+      
+authornote: |
+  We are grateful to Vanessa Scott, Tasnia Haider, and Ishapreet Kaur for their help in collecting data for the present study and to the research assistants of the UCR Perception, Action, and Development Lab for annotating videos.
+
+  This work was funded by National Science Foundation Grant BCS #1941449 to the first author. The authors declare no conflict of interest.
+
+abstract: |
+  Long form audio recordings have had a transformational effect on the study of infant language acquisition by using mobile, unobtrusive devices to gather full-day, real-time data that can be automatically scored. How can we produce similar data in service of measuring infants' everyday motor behaviors, such as body position? The aim of the current study was to validate long form recordings of infant position (supine, prone, sitting, upright, held by caregiver) based on machine learning classification of data from inertial sensors worn on infants' ankles and thighs. Using over 100 hours of video recordings synchronized with inertial sensor data from infants in their homes, we demonstrate that body position classifications are sufficiently accurate to measure infant behavior. Moreover, classification remained accurate when predicting behavior later in the session when infants and caregivers were unsupervised and went about their normal activities, showing that the method can handle the challenge of measuring unconstrained, natural activity. Next, we show that the inertial sensing method has convergent validity by replicating age differences in body position found using other methods with full-day data captured from inertial sensors. We end the paper with a discussion of the novel opportunities that long form motor recordings afford for understanding infant learning and development.
+  
+keywords          : "body position, motor development, everyday experiences, sitting, machine learning"
+wordcount         : "11,995"
+
+bibliography      : "master.bib"
+
+floatsintext      : no
+linenumbers       : no
+draft             : no
+mask              : no
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+biblio-style      : "apa"
+classoption       : "man"
+output:
+  papaja::apa6_pdf:
+    citation_package: biblatex
+header-includes:
+  - \raggedbottom
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+library(papaja)
+library(knitr)
+library(patchwork)
+library(scales)
+library(ggforce)
+library(hms)
+library(tidyverse)
+library(lubridate)
+library(rstatix)
+```
+
+```{r analysis-preferences}
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+pos_levels <- c("Supine", "Prone", "Sitting", "Upright", "Held")
+pal <-  c("#E69F00","#56B4E9", "#009E73","#F0E442", "#0072B2") %>% 
+  set_names(pos_levels)
+
+theme_update(text = element_text(size = 14),
+             axis.text.x = element_text(size = 14, color = "black"), 
+             axis.title.x = element_text(size = 16),
+             axis.text.y = element_text(size = 14,  color = "black"), 
+             axis.title.y = element_text(size = 16), 
+             panel.background = element_blank(),panel.border = element_blank(), 
+             panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(), axis.line = element_blank(), 
+             legend.key = element_rect(fill = "white")) 
+
+# SUBMITTED DATA IS BASED ON THE FOLLOWING SESSION IDS
+#9908  9909  9910  9911 10201 10203 10204 10301 10501 10601 10701 10702 10703 10704 10802 10901 11001 11002 11004 11102 11103 11104 11202 11501 11601 11901 12001 12002 12101 12302 12303 12501 12502 13001
+```
+
+Infants' movements facilitate and constrain how they can interact with their surroundings. Changes in *body position*---whether infants are supine on their backs, prone on their bellies, sitting, upright, or held by a caregiver---have in-the-moment consequences for vision, object exploration, and social interaction. When sitting and upright, infants have a better view of faces and distant objects compared to their view while prone [@Freeplay; @LuoFranchak2020; @CWW]. While walking upright, infants move farther away from caregivers and share toys in different ways compared to infants crawling in a prone position [@ChenSchneider2022; @Karasik2011]. As infants grow older and acquire new abilities, such as independent sitting and walking, they spend more time sitting and upright and less time held, supine, and prone [@Survey; @Thurman2017; @Freeplay; @AdolphCTL2014]. Thus, characterizing individual differences in the day-to-day accumulation of body position experiences informs developmental theory by revealing differential opportunities for learning [@CurrentOpinion].
+
+In this paper, we present an inertial sensing method to classify infants' full-day, real-time body position. Our method takes inspiration from a more mature technology: Long-form audio recordings of infants' language experiences. We begin by identifying the key features of wearable audio recorders that should be replicated in long-form recordings of motor behavior. Next, we review the current state-of-the-art in measuring infant motor behavior---video and survey data---and their limitations in capturing real-time, full-day behavior. Finally, we discuss the advantages of using inertial sensing to classify motor behavior. Despite promising past results in brief, supervised sessions [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], the current investigation takes a needed step forward by testing accuracy over long, unsupervised recordings in what we term a *distal comparison*. 
+
+## Inspiration from Long-Form Audio Methods
+
+The LENA&reg; recorder is a commercial device worn in a custom shirt pocket; the recorder has sufficient battery life and storage to record for an entire day. Closed-source LENA&reg; algorithms analyze the audio recordings to provide automatic counts of useful metrics, such as the number of words spoken by adults in the vicinity of the infant. Long-form audio recordings have had a transformational impact on language development research by allowing researchers to characterize opportunities for learning in daily life. For example, measuring the amount of speech heard by infants in the home [@Weisleder2013] or in a daycare setting [@PerryPrince2018] revealed how individual differences in speech input predict later vocabulary. Full-day language recording synchronized with other data sources allows researchers to identify how auditory input and vocal production interact with other processes. Beyond individual differences in aggregated data, long-form recordings reveal the temporal schedule of experiences. For example, infants' daily experiences hearing music are clustered in time, with "bursty" episodes of music presence separated by relatively long periods during which music is absent [@MendozaFausey2022]. 
+
+We identified five key features of long-form audio methods that should be replicated in analogous studies of motor behavior. First, wearable audio recorders are *mobile*. Measurement is not limited to a particular room because the recording device travels with the participant. Data are recorded to onboard device memory, so participants do not need to be in range of a receiver. Second, wearable audio recording is more *unobtrusive*. Participants' reactivity to observation, such as from a video camera, may influence behavior more compared with a sensor that records only motion or audio data. For example, caregivers spoke more frequently to infants during a video-recorded portion of a home recording compared with audio-only segments captured by a LENA&reg; device [@Bergelson2019Input]. Third and fourth, recordings capture *real-time data* over a *full day*. Real-time data are vital for identifying processes that unfold over minutes or seconds within an individual as opposed to comparisons of aggregated data between infants. Synchronizing real-time data to other data streams helps to reveal sources of variability within an individual [e.g., @WassPhillips2022; @MalachowskiSalo2023]. Full-day recordings are essential for capturing experiences across the heterogeneity of daily routines that moderate behavior (e.g., play, feeding, errands) [@KadookaCaufield2021; @Tamis-LeMondaCustode2018]. "Burstiness" of behavior means that long recordings are needed to capture clusters of events amid long periods in which they may be absent [@BarbaroFausey2022; @WarlaumontSobowale2021]. Fifth, *automatic classification* means that the approach can scale to analyze large numbers of participants over long recordings without the bottleneck of manual annotation/transcription. 
+
+But automatic classification can only replace human annotation if it is sufficiently accurate. An independent assessment of the LENA&reg; algorithms found mixed results about classification accuracy. Correlations between human transcribed counts of adult words and child vocalizations against LENA&reg;'s automatic counts were strong, *r* = .698 and *r* = .649, respectively [@CristiaLavechin2020]. For other metrics, such as the number of "conversational turns" between the child and communicative partners, agreement was poor (*r* = .364). Thus, for some use cases (and for some metrics), long form audio recordings provide a mobile, unobtrusive way to automatically score real-time data over a full day. 
+<!-- In the remainder of the paper, we turn to the question of how to replicate those key features in long form recordings of motor behavior. -->
+
+## Limitations of Video and Survey Methods
+
+Video and survey methods are the current state-of-the-art in assessing infants' gross motor behavior in naturalistic tasks. Although each method has complementary advantages and disadvantages for characterizing infants' everyday motor experiences, neither method fulfills all five key features of long form audio recordings reviewed in the previous section.
+
+Video observation is the most common way of measuring infant motor behavior in home recordings. Most often, an experimenter with a handheld camera follows infants from room to room to ensure that their movements are visible throughout the recording session [@Karasik2011; @ChenSchneider2022; @HerzbergFletcher2021]. The primary advantage of video recording is that it captures real-time behavior.Standard 30 Hz video recording is adequate to capture changes in infant body position that occur on the timescale of seconds. However, requiring an experimenter to operate a camera is obtrusive, whereas relying on a stationary camera means that infants will be absent from view as they move from place to place. Moreover, video observation cannot easily scale to long durations or large numbers of participants. An experimenter cannot follow behind infants to record their behavior from morning to night; typical video recording sessions last 45-120 minutes [@Karasik2011; @ChenSchneider2022; @HerzbergFletcher2021], far short of capturing the variety of activities across the full daily routine. Even if full-day videos were available, the lack of suitable automatic classification tools means that the human cost of annotation would be immense. Our annotation of body position takes approximately 2-5 hours to complete for every hour of video (depending on how often infants switch positions), meaning that a full "waking day" of approximately 11 hours for a 12-month-old [@GallandTaylor2012] could take 22-55 hours of labor to annotate. 
+
+In contrast, survey methods such as daily diaries/inventories or ecological momentary assessment (EMA) are mobile, unobtrusive, can be applied across an entire day, and do not need laborious annotation. Diary studies provide caregivers with logs or structured interviews record activities [@MajnemerBarr2005; @KarasikKuchirko2022]. Ecological momentary assessment uses smartphone notifications to prompt caregivers to make repeated estimates of behaviors throughout the day [@Survey; @KadookaCaufield2021]. Although such survey responses are valuable in aggregate, they  lack the real-time temporal resolution to describe moment-to-moment changes in behavior. At best, EMA surveys prompt caregivers to make hourly observations; increasing the number of surveys per day would be too burdensome for the respondent. Thus, despite being a useful tool for estimating broad developmental changes and individual differences in infants' motor experiences, survey methods are not suited for capturing within-participant temporal dynamics.
+
+## Promise of Inertial Sensing Methods 
+
+Measuring infant movement with inertial movement units (IMUs) is a promising avenue for long form recordings of motor behavior in the home [@CliffReilly2009; @Barbaro2019; @BruijnsTruelove2020; @LoboHall2019]. Lightweight sensors (10-30 g) can be embedded in garments to make recordings fully *mobile*, and they are *unobtrusive* because they do not require a researcher to follow with a camcorder. Many commercially-available IMUs have > 12 hour battery life with onboard storage to record *real-time*, *full-day* motion data at a high sampling rate (e.g., 50-100 Hz). 
+
+The open question is whether *automatic classification* is sufficiently accurate to measure movement categories that are relevant to developmental and clinical research, and whether measurements continue to be accurate over long recording periods. Data processing algorithms are needed to classify the raw sensor data (i.e., linear and angular acceleration time series) into meaningful categories. Categorizing body position---supine on the back, prone on the belly, sitting, upright, or held off the ground by a caregiver---is a complex because movement can vary greatly *within* a body position. An upright infant can be standing still or can be walking briskly across the room. A prone infant can be stationary in "tummy time", or they can crawl in a myriad of ways [@AdolphVereijken1998]. Moreover, the configuration of the arms, legs, and torso within a body position can vary greatly in everyday contexts. Infants can sit on the floor in a tripod position with support from an arm, in a "V" position with legs fully extended, or in a "W" position with knees bent. Sitting on a caregiver's lap without the need to maintain balance means that the legs can dangle and the torso can lean in different directions. Sitting in a high chair or car seat reduces the magnitude of postural sway within sitting, and creates even more possibilities for how the arms and legs may move relative to the torso. Finally, caregivers frequently pick up and transport infants, creating motion signals that need to be differentiated from independent activity [@KwonZavos2019; @PatelShi2019]. 
+
+Modern approaches to human activity recognition have used machine learning to classify activity categories based on features derived from IMU data in adults [@Preece2009; @Arif2015], children [@NamPark2013; @RenDing2016; @StewartNarayanan2018], and infants [@YaoPlotz2019; @FranchakScott2021; @AiraksinenRasanen2020]. Three prior investigations have used different machine learning techniques to categorize infant body position from IMUs towards the goal of collecting full-day data. @AiraksinenRasanen2020 tested 4- to 8-month-olds in a laboratory visit with a 4-sensor array (one on each thigh and one below each shoulder), and found 95% accuracy in distinguishing between body position categories that crawling infants could perform on the floor (excluding times that infants were held by caregivers). Using a wider age range of 6-18 months, @FranchakScott2021 found 98% accuracy (*kappa* = 95%) in a laboratory validation study with a 3-sensor array (ankle, knee, thigh on a single leg) in categorizing body position that included infants who could both crawl and walk and also included a category for caregiver holding. Most recently, @AiraksinenGallen2022 conducted a validation study of body position classification in either a home or clinic testing 4- to 19-month-olds with their 4-sensor system, refining their previous method to detect moments that infants were carried by caregivers. Classification accuracy did not vary between lab and home settings, and was generally high (95%, *kappa* = .93). Although all three studies yielded promising classification accuracy, accuracy was assessed in brief (15-60 minute) sessions supervised by a researcher, leaving the open question of how well body position classification will scale to testing across an entire day of natural home life. 
+
+## Goals of the Current Study
+
+Accordingly, the overarching goal of the current study is to test the validity of long-form body position recording in the home during unsupervised, everyday behavior. Supervised recordings from past work [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022], whether in the home or in the lab, let researchers set up the situation to encourage or restrict certain behaviors. Prior work focused on "free play", in which caregivers were asked to play with the infant without restraining the infant or otherwise shaping how they could move. However, in a real day, non-play activities (e.g., eating lunch in a high chair) create challenging situations for applying automated classification of body position. For example different types of sitting---independently on the floor, supported on a caregiver's lap, or restrained in a high chair---all need to be scored as sitting. Moreover, classifiers must be able to detect new variants of behaviors that might arise over the course of a real day; it is impossible for researchers to gather training data for every possible variation that might occur. Thus, our central question is whether models trained on video-recorded observations at the beginning of the day generalize to predict behavior at a later time? Assessing the validity of temporally *distal* periods---when infants and caregivers are unsupervised and free to follow their everyday routines---is a crucial step to establish whether automatic classification can be used to measure body position across a day. 
+
+In the current study, we report the feasibility and validity of body position classification over the full day in the home based on 34 testing sessions from 22 infants aged 4-14 months. Participants received a custom pair of infant leggings embedded with 4 IMUs (one on each ankle and one on each thigh) and a video camera to collect ground truth data about infant body position. A *proximal comparison* period began when participants received the equipment and completed a guided phone call during which caregivers were asked to elicit different body positions based on prompts from the experimenter. This "semi-supervised" period was most similar to previous recordings because it occurred during a convenient time for the infant and caregiver to play while they received instructions from the experimenter. The **first goal** of the current study was to determine the accuracy of body position classification during the proximal comparison period using this novel, semi-supervised procedure in participants' homes. Past work found better performance using "individual models"---models that were trained on one participant's data to predict their later behavior---compared with a "group model" that aggregated data from all infants to create a single body position classifier [@FranchakScott2021], so we compared both modeling approaches in the current investigation.
+
+The crucial test was how well models predicted later behavior over longer recordings of everyday activities. A second, *distal comparison* period followed the proximal comparison period and captured approximately 90 minutes of home behavior that was completely unsupervised. Caregivers and infants could (and did) do whatever they wished, and no researcher was present. Because this recording happened a considerable amount of time after the initial setup and instructions from the experimenter, accuracy could decline if caregivers or infants moved the garment or sensors. Moreover, increasing variation in everyday activities during the distal comparison creates a greater challenge, testing whether body position classification models can generalize to novel test cases. Thus, the **second goal** of our study was to assess accuracy during the distal comparison. 
+
+After the distal comparison period when video recording ceased, we asked caregivers to have infants wear the IMUs for the rest of the day until their regular bedtime, creating the **first real-time, full-day dataset of infant body position**. Interpreting such data required caregivers to log when infants napped, when they removed the sensor garment for diaper changes or other reasons, and when infants went to bed at the end of the day. Thus, the **third goal** of the study was to examine the quality of the full-day data. Could infants wear the sensor garment throughout the desired period? If full-day classifications of infant behavior are accurate, they should demonstrate convergent validity with other methods. Thus, we determined whether full-day body position measurements conformed to expected age differences in body position. Based on past results [@Survey], infants should spend increasingly more time sitting and upright but less time supine over the age range tested (4 to 14 months). 
+
+# Methods
+
+## Participants and Design
+
+```{r participants, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+ppts <- read_csv("data/imu-compiled.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older"))) %>% 
+  filter(id_uni != 10401)
+num_younger <- ppts %>% filter(group == "Younger") %>% .$id %>% unique(.) %>% length(.)
+num_older <-  ppts %>% filter(group == "Older") %>% .$id %>% unique(.) %>% length(.)
+num_sessions <- ppts %>% group_by(group, id, session) %>% slice_head(n = 1) %>% count %>% group_by(group, id) %>% count
+age <- ppts %>% group_by(group) %>% get_summary_stats(age) %>% column_to_rownames("group")
+```
+
+Infants were recruited in one of two age groups: *Younger* infants were between 4 and 7 months and *older* infants were between 11 and 14 months. There were `r num_younger` infants in the 4-7 month group and `r num_older` in the 11-14 month group. Ten infants were female and 12 were male. Families were recruited through social media advertisements and from community events in Southern California. Most infants were reported to be either Hispanic and White or Non-Hispanic and White. Families were compensated \$30 for every home recording session they completed. The BLINDED Institutional Review Board reviewed and approved all procedures associated with the study. All caregivers gave their informed consent before the start of the study.
+
+Most participants were tested in a single session (*n* = `r nrow(num_sessions %>% filter(n == 1))`), but `r nrow(num_sessions %>% filter(n > 1))` participants contributed between 2-4 sessions as part of an ongoing longitudinal study. Although including more data from some participants could over-represent their characteristics in the model, we reasoned that this drawback was outweighed by having more available data to use for training. Only 1 session was excluded due to a technical error---one of the four IMU sensors failed to record, resulting in an unusable set of data for classification. Across the two age groups, we report data on a total of `r length(unique(ppts$id_uni))` sessions, with `r num_sessions %>% filter(group == "Younger") %>% pull(n) %>% sum` sessions from younger infants and `r num_sessions %>% filter(group == "Older") %>% pull(n) %>% sum` sessions from older infants. Across sessions, younger infants' age ranged from `r apa_num(age["Younger","min"], digits = 1)` to `r apa_num(age["Younger","max"], digits = 1)` months (*M* = `r apa_num(age["Younger","mean"], digits = 1)`) and older infants' age ranged from `r apa_num(age["Older","min"], digits = 1)` to `r apa_num(age["Older","max"], digits = 1)` months (*M* = `r apa_num(age["Older","mean"], digits = 1)`). The total number of recording sessions (`r length(unique(ppts$id_uni))`) exceeded the number of sessions employed in comparable past work: 10 in @NamPark2013, 15 in @FranchakScott2021, 22 in @AiraksinenRasanen2020, and 33 in @YaoPlotz2019.
+
+## Apparatus
+
+Four inertial movement units (IMUs) were used to record infant movement across the day (MC10 Biostamp). A custom garment was designed to hold the IMUs: Internal pockets were sewn into snug-fitting infant leggings so that IMUs would stay close to the body (reducing vibration). A pocket over the thigh and a pocket just above the ankle were sewn on the lateral surface of the right and left legs of the garment. Multiple sizes of the garment were created (modeled on US 3-6 mo, 6-9 mo, 9-12 mo, and 12-18 mo sizing). Caregivers indicated in advance which size would fit their infant, and to "size down" if between sizes to ensure a snug fit and minimize sensor movement. Each garment had a distinct pattern on the seat of the pants so that caregivers could identify front versus back and place the garment in the correct orientation. 
+
+Each sensor had sufficient battery and onboard torage to record accelerometer and gyroscope data for approximately 12 hours. We chose a sampling rate of 62.5 Hz (one of the available presets) based on prior work that used rates of 50-64 Hz [@FranchakScott2021; @AiraksinenRasanen2020; @YaoPlotz2019]. Infants also wore a LENA&reg; recorder throughout the day in the front pocket of a LENA&reg; shirt, located near the infant’s chest, to determine whether data could be simultaneously recorded from the LENA&reg; and IMU sensors (LENA&reg; data were not analyzed in the current study).
+
+```{r garment, out.width="0.75\\linewidth", include=TRUE, fig.align="center", fig.cap="Sensor garment worn by infant participant. Four IMUs were placed in interior pockets sewn into a tightly-fitting pair of infant leggings. White dashed rectangles mark the approximate locations of each sensor pocket (above the left and right ankles and on the left and right thighs, just below the thighs). A white dashed rectangle also marks the LENA audio recorder worn in a pocket on the infant's shirt.", echo=FALSE}
+knitr::include_graphics("figures/garment.jpg")
+```
+
+Videos were captured at 30 Hz using an action camera on a miniature tripod (Insta360 ONE R) that caregivers placed in the same room as the infant. Although recordings lasted 3 hours, they were divided into two video files of approximately 90 minutes temporally separated by a gap of 40-45 s. Caregivers received a log sheet to record times that infants napped and times that the sensor garment was removed from the infant (e.g., baths, diaper changes, errands). 
+
+## Procedure
+
+```{r exemplar-timeline, out.width="0.99\\linewidth", include=TRUE, fig.align="center", fig.cap="Timeline from an exemplar participant (older infant 15). The top row shows the model-predicted body position across the entire recording period. Annotations indicate when the video camera was turned on by the experimenter when arriving at the house, when the sensors were first placed on the infant, when the guided call took place, and when the video files were recorded. Gray areas on the timeline indicate naps, and white areas indicate times when the sensors were removed. The bottom row shows a zoomed-in view of the video period during which ground truth data were available. The top timeline shows human-coded body position and the bottom row shows model-predicted body position; these were the data used for validation. The first part of the video period was the proximal comparison, when video and motion data were highly synchronized. The second part of the video recording was the distal comparison that had coarser synchronization. Accuracy data for the distal comparison are provided overall and during 10-minute bins, marked by vertical dashed lines.", echo=FALSE}
+knitr::include_graphics("figures/timeline.png")
+# Generated from analysis-pt2/methods-exemplar-agreement.R
+# Annotated in illustrator based on event times:
+# Exemplar participant is 120-1
+# > pt2_start_time = "2022-11-13 11:11:00 PST"
+# > pt2_end_time = "2022-11-13 12:41:01 PST"
+# > session_param$start_time_coded = "2022-11-13 10:02:40 PST"
+```
+
+Figure \@ref(fig:exemplar-timeline) shows an exemplar timeline of the entire procedure and recording periods for a single participant. A researcher arrived at the participant’s home in the morning and set each device to record while at the doorstep. To create a recognizable synchronization point between the video recording and IMU data, the researcher dropped the sensor garment containing the IMUs on a surface in view of the camera, as in @FranchakScott2021. All the equipment---once recording and with synchronization information recorded---was placed inside a large bucket and left outside the family's front door. The researcher then called the caregiver on the phone and walked them through a set of procedures needed to properly set up the equipment and record video for ground truth human annotation of body position. At the start of this "guided call", the caregiver was instructed to place the camera in an area that captured the majority of the room. Next, they were asked to put the pair of leggings and shirt on their infant, with the researcher providing guidance about how to correctly orient the garments. 
+
+Afterwards, the researcher asked the caregiver to complete a number of guided activities with their infant. Within view of the camera, the caregiver was asked to place their infant in several different positions: lying supine, lying prone, sitting on the floor, standing upright, held by the caregiver while the caregiver walked back and forth, crawling, walking, and sitting in a restrained seat (e.g., high chair). Depending on the infants' age and motor skill level, the positions could be done independently or were completed with assistance from the caregiver. The researcher kept time to ensure at least 1 minute of behavior for each activity. Once completed, the caregiver was then instructed to play with their infant for 10 minutes within view of the camera to collect additional ground truth data. 
+
+Afterwards, they were asked to go about their day as usual with the infant wearing the sensor garment until their bedtime, only taking off the sensor for naps, baths, diaper changes, and trips out of the house. The caregiver logged the times the sensors were removed (blank areas in the timeline in Figure \@ref(fig:exemplar-timeline)) or the child took a nap (gray areas in the timeline in Figure \@ref(fig:exemplar-timeline)) so that those times could be excluded from analysis. The following day a researcher picked up the bucket of equipment.
+
+Because the camera only had the battery life to record for ~3 hours (automatically split into two 90-minute video files), this divided the day into different periods for analysis. As seen in the bottom of Figure \@ref(fig:exemplar-timeline)), the *video period* comprised the first three hours of recording starting from the researcher's arrival when they turned on the camera. The first 90-minute video file, termed the *proximal comparison*, contained the activities during the guided call followed by a period during which infants and caregivers resumed their normal activities. Because this video contained the synchronization point, the data in this period had high temporal synchrony between IMU and video data. Synchronization errors were estimated to be less than 30-60 ms (1-2 video frames). The second video file comprised the *distal comparison*. This video recorded the next 90 minutes of natural activity. However, because of a limitation in the camera, there was a variable gap of ~40 s between the two videos, so synchronization in the distal comparison video was coarser, with estimated temporal offsets of ~5 s in either direction.
+
+## Body Position Annotation
+
+The proximal and distal comparison videos for each participant were annotated by trained human coders to identify infant *body position* into one of 5 mutually-exclusive categories following the definitions in prior work [@FranchakScott2021]: supine, prone, sitting, upright, or held by caregiver. All coding was done using Datavyu software (datavyu.org). A Databrary repository contains the entire video recording, coding files, and raw IMU data for a single participant (https://nyu.databrary.org/volume/1580).
+
+Supine was coded when the infant was lying on their back, on their side, or was reclined up to a 45  Prone was coded when the infant was lying on their stomach, was stationary supported by the hands/knees or the hands/feet, or was crawling. We scored sitting to include any form of the following seated positions: 1) infants sat with their buttocks on a surface, such as on the floor or a caregiver’s lap, 2) infant was in a kneeling-sit position, in which their knees were on the ground with their legs tucked underneath the buttocks, and 3) infant was in a seating device, such as a high chair, that kept the torso oriented perpendicular to the ground (a reclined position, such as in a young infant's car seat, would be counted as supine). Upright was coded when the infant was standing or squatting on the ground with two feet or walking (regardless of whether infants' balance was assisted by a caregiver or with their hands holding onto something for support). Our goal in creating a category for "held by caregiver" was to separate times when infants were in control of their body position from times when they were suspended in the air (rather than resting on furniture or a surface). Held was coded when infants were carried off of the groun. However, when the caregiver was sitting with the infant in their lap the infant’s body position was coded as if the caregiver was a surface (e.g., if the infant was sitting on the caregiver’s lap this was coded as sitting). Times during the video when the infant was out of view were excluded. Periods when the sensor garment was adjusted or taken off the infant were also excluded, as were transitions between body positions. 
+
+A primary coder completed annotation for the full length of the video, while an independent reliability coder completed annotation for the first thirty minutes of each video. Interrater reliability was based on the proportion of video frames that the two coders chose the same body position code. Overall agreement averaged 90.9% across video files, ranging from 68.4%-100% for individual video files. Cohen's kappa averaged 86.1% across video files, ranging from 31.0%-100% for individual video files.
+
+## Body Position Classification
+
+The same machine learning classification process was used as in prior work [@FranchakScott2021]. Using the synchronization point, human-coded body annotations from video were linked to the corresponding times in the IMU time series data. A single, merged dataset was created with synchronized accelerometer signals (in three orientations: X, Y, and Z) and gyroscope signals (in three orientations: roll, pitch, and yaw) for each of the four sensors (left thigh, right thigh, left ankle, right ankle) with the corresponding timestamp and body position code using the *timetk* package [@DanchoVaughan2023] and the *lubridate* package [@GrolemundWickham2011] in R version 4.1.2 [@R42].
+
+Classification training and prediction was conducted on a windowed dataset that summarized the raw, 62.5 Hz motion signals within 4-s windows. Data were reduced in time by creating overlapping moving windows (4-s long, comprising 250 samples) starting each second, which is a common unit of analysis in prior studies of human activity classification [@FranchakScott2021; @NamPark2013; @AiraksinenRasanen2020]. For each 4-s window, we aggregated the 250 samples to create single scores for a variety of motion features---summary statistics that could be fed into the machine learning model. The minimum, maximum, 25th percentile, 75th percentile, mean, median, skew, kurtosis, standard deviation, and sum were computed for each signal (e.g., right thigh X linear acceleration, left ankle pitch angular acceleration). The 10 summary statistics and 24 sensor signals generated 240 columns of motion features that described movement within each window. Furthermore, a series of cross-sensor and cross-orientation summaries (such as the correlation, magnitude, and difference between pairs of sensors) added an additional 196 columns of motion features. The 436 total motion features corresponded to a single body annotation code for each 4-s window. Windows were only used for training/testing if they contained a single body position for > 75% (3 s) of time within the window to ensure that motion signals could be linked to an unambiguous example of each behavior.
+
+The resulting windowed dataset was used for machine learning classification and validation. For each analysis reported in the results, a subset of data were defined as a "training" set and another, independent portion of the data were defined as a "testing" set (further described below). Random forest models [@Breiman2001] used the training set to learn the body position label for each window from the set of 436 motion features using the *randomForest* package [@LiawWiener2002]. The resulting random forest model could later be applied to a set of testing data with the *predict* function. 
+
+## Data Sharing and Transparency
+
+Three online repositories contain openly shared data, materials, and analysis code. A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_example) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method. This reproducible manuscript created in RMarkdown and *papaja* [@papaja] can be regenerated from those data files for full computational transparency.
+
+# Results
+
+```{r total-duration}
+duration <- ppts %>% group_by(id_uni) %>% 
+  summarize(start_time = min(clock_time_start), end_time= max(clock_time_end)) %>% 
+  mutate(duration = as.duration(end_time - start_time), duration_hours = as.numeric(duration, "hours")) %>% arrange(duration)
+```
+
+We report three sets of results based on `r length(unique(ppts$id_uni))` full-day testing sessions resulting in a total of `r round(sum(duration$duration_hours))` hours of movement recording. 
+
+<!-- First, we focus on the accuracy of group and individual models trained and validated from data during the proximal comparison period. This period is unique in having the highest degree of temporal synchrony between video and motion data, allowing us to assess the accuracy of individual body position events. Second, we applied models trained from data during the proximal comparison to predict infant behavior during the distal comparison, when coarser synchrony between video and motion data was available. This distal comparison is critical because it provides, to our knowledge, the first-ever test of how well infant body classification models predict behavior that is variable, unrestricted, and unsupervised. Data from the first two sets of analyses confirm that body position classification models are accurate across a long period of time, suggesting that data from the entire day will be valid. In the third set of results we examine the data quality of full-day recordings and test whether full-day recordings capture well-established age differences in body position experiences.  -->
+
+## Assess the Proximal Accuracy of Body Position Classification Models
+
+<!-- group_split_metrics, generated from group_split_comparison in this proj, stable copy in data/ -->
+
+```{r metrics, warning=FALSE, fig.cap="Metrics of agreement between human-annotated body position and model predictions of body position from the proximal comparison period. Overall accuracy (A) and Cohen's Kappa (B) are plotted separately for group models and individual models. Each blue circle represents that accuracy for each recording session. Horizontal black bars indicate the mean across sessions.", fig.align="center", fig.width=6, fig.height=3, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+metrics <- read_csv("data/group_split_metrics.csv") %>% 
+  filter(model %in% c("group", "split")) %>% 
+  mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
+
+metrics_long <- metrics %>% pivot_longer(cols = `Overall Accuracy`:Kappa, 
+                                         names_to = "metric",
+                                         values_to = "value")
+
+metric_plot <- function(ds, met) {
+  ds %>% filter(metric == met) %>% 
+    ggplot(aes(x = Model, y = value)) + 
+    geom_sina(alpha = .7, fill = "turquoise3", size = 4, maxwidth = .5, shape = 21) +
+    stat_summary(fun = "mean", mapping = aes(x = Model, y = value), shape = "-", fill = "black", size = 4) + 
+    ylim(0, 1) + ylab(met) + xlab("") + 
+    theme(plot.title.position = "plot",
+          axis.title.y = element_text(size = 13),
+          axis.text.y = element_text(size = 11),
+          axis.text.x = element_text(size = 13))
+}
+
+metric_labels <- c("Overall Accuracy", "Kappa", "Sensitivity", "Pos Pred Value")
+title_labels <- c("A. Overall Accuracy", "B. Kappa", "C. Sensitivity", "D. Pos. Pred. Value")
+metric_plots <- map(metric_labels, ~ metric_plot(metrics_long, .x)) %>% map2(., title_labels, ~.x + ggtitle(.y))
+(metric_plots[[1]] + metric_plots[[2]])
+
+```
+
+```{r metrics-table, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics.csv")}
+
+metrics_summary <- metrics_long %>% group_by(Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity", metric != "Balanced Accuracy", metric != "F1") %>% 
+  relocate(mean_Group, .after = median_Group) %>% 
+  relocate(sd_Group, .after = mean_Group) %>% 
+  mutate(across(-metric, ~ apa_num(.x, digits = 3)),
+         metric = factor(metric, levels = metric_labels)) %>% 
+  arrange(metric)
+ 
+  apa_table(metrics_summary, col.names = c("Metric", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)),
+          caption = "Model performance metrics (overall accuracy, Cohen's Kappa, sensitivity, positive predictive value) from the proximal comparison period. Descriptive statistics are shown separately for group and individual models.")
+  
+metrics_lookup <- metrics_long %>% group_by(Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:n), -(q1:mad), -se, -ci) %>%
+  pivot_wider(names_from = Model, values_from = c("min","max","median", "mean", "sd")) %>% 
+    column_to_rownames("metric")
+```
+
+\renewcommand{\arraystretch}{.75}
+
+```{r metrics-by-class, cache=TRUE, cache.extra=tools::md5sum("data/group_split_metrics_class.csv")}
+metrics_class <- read_csv("data/group_split_metrics_class.csv") %>% 
+  filter(model %in% c("group", "split")) %>% 
+  mutate(Model = factor(model, levels = c("group", "split"), labels = c("Group", "Individual")))
+
+metrics_long_class <- metrics_class %>% pivot_longer(cols = `Balanced Accuracy`:Kappa, 
+                                         names_to = "metric",
+                                         values_to = "value")
+
+metrics_long_summary <- metrics_long_class %>% group_by(Class,Model, metric) %>% 
+  get_summary_stats(value) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  filter(metric != "Neg Pred Value", metric != "Specificity", metric != "Balanced Accuracy", metric != "F1") %>% 
+  relocate(mean_Group, .after = median_Group) %>% 
+  relocate(sd_Group, .after = mean_Group) %>% 
+  mutate(across(-(Class:metric), ~ apa_num(.x, digits = 3)),
+         metric = factor(metric, levels = metric_labels),
+         Class = factor(Class, levels = c("Supine", "Prone", "Sitting", "Upright", "Held"))) %>% 
+  relocate(metric, .before = Class) %>% 
+  arrange(metric, Class) 
+
+class_table <- metrics_long_summary %>% mutate(metric = as.character(metric))
+class_table$metric[duplicated(class_table$metric)] <- " "
+
+apa_table(class_table, col.names = c("Metric","Position", "Median", "Mean", "SD", "Median", "Mean", "SD"), col_spanners = list("Group" = c(3, 5), "Individual" = c(6, 8)),
+          midrules = c(5, 10),
+          caption = "Model performance metrics for each body position (supine, prone, sitting, upright, and held) during the proximal comparison period, shown separately for group and individual models.")
+metrics_long_summary <- metrics_long_summary %>% 
+  mutate(rowname = paste(Class, metric)) %>% 
+  column_to_rownames("rowname")
+```
+
+The first set of analyses use data from the proximal comparison to determine the "best case" accuracy of the models, training and testing on similar types of data. The high degree of temporal synchronization between video and motion data during this period makes it possible to link human-coded body position annotations to each 4-s window of motion data, providing ground truth data for model training and testing. As in past work [@FranchakScott2021], we compared two types of models: *group models* and *individual models*. To assess the accuracy of body position classification for each recording session, we reserved the (temporally) last 25% of a session's proximal comparison data as the testing set. The testing set was never used as training data, and was the same for both modeling approaches to facilitate direct comparisons between the models. We generated two different training datasets relative to each testing set. For the group model training set, we aggregated the first 75% of all **other** sessions' proximal comparison data. This leave-one-out cross-validation tested the generalization of the model to a recording session that was not used at all in the training set. The individual model training set used the first 75% of data from the testing set's session. The individual model tests whether earlier training data generalize to later testing data within an individual participant's recording. Figure \@ref(fig:metrics), Table \@ref(tab:metrics-table), and Table \@ref(tab:metrics-by-class) summarize the performance of group and individual models using standard metrics for classification. 
+<!-- data/reduce, duplicates of the group_split metrics but performed on reductions of sensor features from group_split_sensor_reduce.R -->
+
+```{r metrics-reduce, cache=TRUE, cache.extra=tools::md5sum("data/reduce/reduce_metrics_right_side.csv")}
+all_files = list.files("data/reduce", full.names = T, pattern = ".csv")
+overall_files = all_files %>% discard(str_detect(., pattern = "class"))
+sensor_comp <- read_csv(overall_files, id = "type")
+sensor_comp <- sensor_comp %>% mutate(type = str_remove(type, "data/reduce/reduce_metrics_"),
+                              type = str_remove(type, ".csv"),
+                              type = factor(type,
+                              levels = c("all", "left_side", "right_side", "hips", "ankles",
+                                         "left_hip","left_ankle", "right_hip", "right_ankle"),
+                              labels = c("All", "Left Hip/Ankle", "Right Thigh/Ankle", "Both Thighs", "Both Ankles", 
+                                         "Left Thigh", "Left Ankle", "Right Thigh", "Right Ankle")),
+                              Model = factor(model, levels = c("group", "split", labels = c("Group", "Individual")))) 
+
+metrics_sensor <- sensor_comp %>% group_by(Model, type) %>% 
+  get_summary_stats(`Overall Accuracy`) %>% 
+  select(-(variable:max), -(q1:mad), -se, -ci) %>% 
+  pivot_wider(names_from = Model, values_from = c("median", "mean", "sd")) %>% 
+  relocate(mean_group, .after = median_group) %>% 
+  relocate(sd_group, .after = mean_group) %>% 
+  mutate(across(-type, ~ apa_num(.x, digits = 3)))
+ 
+apa_table(metrics_sensor, col.names = c("Sensors", "Median", "Mean", "SD", "Median", "Mean", "SD"),    col_spanners = list("Group" = c(2, 4), "Individual" = c(5, 7)), midrules = c(1,5),
+          caption = "Median, mean, and SD of overall accuracy calculated with different sets of sensor features. The top row shows performance using all features calculated from the four sensors. Rows 2-5 show accuracy using pairs of sensors (left thigh and ankle, right thigh and ankle, left and right thigh, left and right ankle), and rows 6-9 show accuracy using each individual sensor.")
+metrics_sensor <- metrics_sensor %>% column_to_rownames("type")
+```
+
+### Overall Accuracy 
+
+Overall accuracy (Figure \@ref(fig:metrics)A) represents the proportion of 4-s windows in the testing set in which the model prediction matched the human annotation of body position. Overall accuracy for group models  (*M* = `r metrics_lookup["Overall Accuracy", "mean_Group"]`) was slightly lower than accuracy for individual models (*M* = `r metrics_lookup["Overall Accuracy", "mean_Individual"]`). Although overall accuracy from our semi-supervised, in-home data collection did not match the near-perfect accuracy  (.95-.98) found in prior in-lab studies [@FranchakScott2021; @AiraksinenRasanen2020], both models approached the level of agreement found between two human coders (*M* = .906). Most likely, lower accuracy in the current study results from the more variable and complex behavior observed in a a semi-supervised setting rather than from a difference in the quality of the classification model; although the first part of the proximal period was guided by the experimenter during a brief phone call, the remainder of the proximal period included natural behavior. Visual inspection of Figure \@ref(fig:metrics)A shows that accuracy values were heavily skewed, with many approaching perfect accuracy but a few sessions with very poor accuracy. Looking at the median performance suggests that the difference between models was not considerable for the typical participant (group median accuracy = `r metrics_lookup["Overall Accuracy", "median_Group"]`; individual median accuracy = `r metrics_lookup["Overall Accuracy", "median_Individual"]`). 
+
+<!-- Indeed, it is notable that the worst-case accuracy from group models (minimum = `r metrics_lookup["Overall Accuracy", "min_Group"]`) was far lower than in individual models (minimum = `r metrics_lookup["Overall Accuracy", "min_Individual"]`). Possibly, individual models accounted for idiosyncrasies in behavior or inconsistencies in sensor placement for those sessions that group models could not generalize to.  -->
+
+As in @AiraksinenRasanen2020, overall accuracy decreased when fewer sensors were used. Table \@ref(tab:metrics-reduce) compared overall accuracy for all four sensors (top row), pairs of 2 sensors (rows 2-5), and single sensors (rows 6-9). The highest accuracy was observed when using all four sensors (group model *M* = `r metrics_sensor["All", "mean_group"]`; individual model *M* = `r metrics_sensor["All", "mean_split"]`), and the lowest when using only a single sensor (left ankle group model *M* = `r metrics_sensor["Left Ankle", "mean_group"]`; right ankle individual model *M* = `r metrics_sensor["Right Ankle", "mean_split"]`). Accuracy for some pairs approached 4-sensor accuracy: Left ankle and thigh had group model accuracy of *M* = `r metrics_sensor["Left Thigh/Ankle", "mean_group"]` and individual model accuracy of *M* = `r metrics_sensor["Left Thigh/Ankle", "mean_split"]`, only 2.2% and 1.5% worse than using all four sensors. Other pairings were less accurate; notably, using both ankles resulted in group model accuracy of *M* = `r metrics_sensor["Both Ankles", "mean_group"]` and individual model accuracy of *M* = `r metrics_sensor["Both Ankles", "mean_split"]`, 12.7% and 7.2% worse than using all four sensors.
+
+### Cohen's Kappa 
+Strong overall accuracy can be misleading when the relative frequency of different classes is unbalanced. Accordingly, we report Cohen's kappa, a commonly-used metric that penalizes missing rare events (Figure \@ref(fig:metrics)B), and we provide classification metrics for each individual body position (Table \@ref(tab:metrics-by-class)) to account for imbalance in body position rates within and between individuals. Similar to overall accuracy, kappa values were strong for both model types with group kappas (*M* = `r metrics_lookup["Kappa", "mean_Group"]`) somewhat worse compared with individual kappas (*M* = `r metrics_lookup["Kappa", "mean_Individual"]`). Guidelines for interpreting kappa statistics [@LandisKoch1977] consider 0.81–1.00 "Almost Perfect,” 0.61–0.80 “Substantial,” 0.41–0.60 “Moderate,” 0.21– 0.40 “Fair,” and 0–0.20 “Slight to Poor”, indicating that agreement for most group and individual model predictions fell in the Substantial to Almost Perfect range. 
+
+As in past work [@FranchakScott2021; @AiraksinenRasanen2020], all body positions were accurately classified even though performance varied somewhat between positions. As Table \@ref(tab:metrics-by-class) shows, mean kappa statistics were strongest for prone (group *M* =  `r metrics_long_summary["Prone Kappa", "mean_Group"]`, individual *M* =  `r metrics_long_summary["Prone Kappa", "mean_Individual"]`) and supine (group *M* =  `r metrics_long_summary["Supine Kappa", "mean_Group"]`, individual *M* =  `r metrics_long_summary["Supine Kappa", "mean_Individual"]`). Sitting performance fell in the middle, and was considerably worse for group models than individual models (group *M* =  `r metrics_long_summary["Sitting Kappa", "mean_Group"]`, individual *M* =  `r metrics_long_summary["Sitting Kappa", "mean_Individual"]`). Held (group *M* =  `r metrics_long_summary["Held Kappa", "mean_Group"]`, individual *M* =  `r metrics_long_summary["Held Kappa", "mean_Individual"]`) and upright (group *M* =  `r metrics_long_summary["Upright Kappa", "mean_Group"]`, individual *M* =  `r metrics_long_summary["Upright Kappa", "mean_Individual"]`) performance was the least accurate, however, average performance was still within the "Substantial" range. 
+
+### Sensitivity and Positive Predictive Value
+
+Sensitivity refers to the proportion of events of a given position that were correctly identified (e.g., out of 100 human-coded sitting windows, how many of those windows did the model correctly classify as sitting?). High sensitivity means that events are unlikely to be missed. In contrast, positive predictive value (PPV) refers to the proportion of events classified for a given position that actually belonged to that position (e.g., if the model said a baby was upright during 100 windows, how many of those windows were indeed human-coded upright events?). High PPV means that we can be confident in the event label. Table \@ref(tab:metrics-by-class) shows the sensitivity and PPV by body position class for group and individual models. For group models, sensitivity and PPV were similar: They were highest for supine, prone, and sitting (the most accurately identified class) and lowest for upright and held. Results for individual models were similar to group models, with the exception of a somewhat lower sensitivity score for held. Overall, the results suggest a reasonable balance between sensitivity and PPV among different body position classes for both model types.
+
+## Measure the Distal Accuracy of Body Position Classification Models
+
+<!-- compiled_agreement, generated from analysis-part2 -->
+
+```{r part2overall, warning=FALSE, fig.cap="Overall agreement between human-coded body position and model-predicted body position in the distal comparison. Agreement for group models is shown in (A) and agreement for individual models is shown in (B). Plots are shown separately for each body position with a reference line that indicates perfect agreement; each point in a plot represents data for a single session. The two outlier participants are plotted in dark gray, with a different shape marking each individual. ", fig.align="center", fig.width=7, fig.height=6.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+
+# PART 2 AGREEMENT
+pt2_group <- read_csv("data/compiled_agreement_position.csv") %>% 
+  filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
+         mutate(pos = factor(pos, levels = pos_levels),
+                code = factor(code, levels = pos_levels)) %>% 
+  filter(file != "104/1")
+pt2_split <- read_csv("data/compiled_agreement_split.csv") %>% 
+  filter(nap_period == 0 & exclude_period == 0 & !is.na(code) & !is.na(pos)) %>% 
+         mutate(pos = factor(pos, levels = pos_levels),
+                code = factor(code, levels = pos_levels)) %>% 
+  filter(file != "104/1")
+
+outlier_files <- c("107/3", "106/1")
+filter_outliers <- . %>% filter(!(file %in% outlier_files))
+
+# Count up position totals and join into an agreement data frame
+calculate_agreement <- function(ds) {
+  model <- ds %>% count(file, pos) %>% 
+    add_count(file, wt = n, name = "total") %>% 
+    mutate(prop_model = n/total)
+  human <- ds %>% count(file, code) %>% 
+    add_count(file, wt = n, name = "total") %>% 
+    mutate(prop_human = n/total)
+  agree_group <- full_join(select(model, file, pos, prop_model), 
+                     select(human, file, code, prop_human), 
+                     by = c("file" = "file", "pos" = "code"))
+  agree_group <- agree_group %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
+                            prop_model = ifelse(is.na(prop_model), 0, prop_model))
+  agree_group <- complete(agree_group, file, pos, fill = list(prop_human = 0, prop_model = 0))
+  
+}
+
+agree <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement)
+
+agreement_scatter <- function(ds) {
+  ggplot() +
+  geom_point(data = filter(ds, file %in% outlier_files), mapping = aes(x = prop_human, y = prop_model, shape = file, fill = pos), fill = "#333333", size = 4, alpha = .5) + 
+  geom_point(data = filter_outliers(ds), mapping = aes(x = prop_human, y = prop_model, fill = pos), shape = 21, alpha = .5, size = 4) + 
+  geom_abline(intercept = 0, slope = 1) + 
+  scale_fill_manual(values = pal, guide = "none") + 
+  scale_shape_manual(guide = "none", values = 22:23) + 
+  scale_x_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Actual Time (%)") + 
+  scale_y_continuous(breaks = c(0,.5,1), labels = c(0, 50, 100), limits = c(-.07, 1.07), name = "Predicted Time (%)") + 
+  facet_wrap("pos", ncol = 2, as.table = T) +
+  theme(panel.spacing.x = unit(1, "lines")) +
+  theme(panel.spacing.y = unit(1, "lines")) + 
+  theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
+}
+
+agree_plots <- map(agree, agreement_scatter)
+agree_plots <- map2(agree_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+agree_plots[[1]] + agree_plots[[2]]
+```
+
+```{r, pt2overalltable, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+#By posture
+pt2corr_with_outliers <- map_dfc(agree, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
+pt2corr_without_outliers <- map_dfc(agree, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
+pt2corr <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
+rm(pt2corr_with_outliers)
+rm(pt2corr_without_outliers)
+
+#Overall
+group_agree_cor <- cor_test(agree$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor <- cor_test(agree$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+group_agree_cor_noout <- agree$group %>% filter_outliers %>% 
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor_noout <- agree$split %>% filter_outliers %>%
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
+colnames(overall_row) <- colnames(pt2corr)
+pt2corr <- bind_rows(pt2corr, overall_row)
+apa_table(pt2corr, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations across the entire distal comparison period. Correlations are provided within each body position and overall. Correlations are presented separately for group and individual models with and without the two outlier participants.")
+```
+
+The first set of results showed that group and individual models trained from data during the proximal comparison period were within the proximal period. In the next analysis, we examine long-term performance by testing how accurately models trained from the proximal period could predict body position during the distal comparison period. A single group model was created using all sessions' proximal period training data (rather than group models leaving out a single session); the same individual models were used. Distal videos had only coarse temporal synchrony with motion recordings which precluded calculating accuracy based on the proportion of matching events. Instead, we summed the amount of time infants were predicted to be in each of the 5 body position categories from the model and compared that to the summed time for the body positions based on human coding [@YaoPlotz2019; @FranchakScott2021]. 
+
+<!-- Below, we report correlations between the model-predicted and human-coded aggregated body position time across the entire distal period as well as within finer, 10-minute bins.  -->
+
+Whereas the proximal analyses used all `r length(unique(ppts$id_uni))` sessions, this was not possible in the distal comparison. Because the start of the visit was scheduled during a time when the infant was awake, it was common for a nap to follow the proximal period. Nine sessions were excluded because the infant was either napping or otherwise not on camera during the entire 90-minute distal recording. Three additional sessions were excluded because a caregiver accidentally turned off the video camera (*n* = 1) or (purposefully) left the house (*n* = 2). This left `r length(unique(agree$group$file))` sessions with usable distal comparison data. 
+
+### Overall Agreement During the Distal Comparison
+
+Figure \@ref(fig:part2overall) and Table \@ref(tab:pt2overalltable) summarize the overall agreement during the distal comparison period. For each session, we calculated the actual time spent in each body position (out of times the infant was visible on camera and awake) using human annotated body position (x-axis on Figure \@ref(fig:part2overall)). Predicted time was calculated the same way for group and individual model predictions, omitting the off-camera and nap periods to make a direct comparison. Overall---across participants and across body position classes---agreement was strong: The correlation between group model predictions and human-coded time was *r* = `r group_agree_cor`, and the correlation between individual model predictions and human-coded time was *r* = `r split_agree_cor`. As in the proximal comparison, agreement varied somewhat between body positions; in particular, agreement for held was poor. Unlike in the proximal period, some body positions were better predicted by group models and others by individual models. 
+
+Visual inspection of Figure \@ref(fig:part2overall) indicated two extreme outliers, which we marked by a gray square and a gray diamond. The "gray square" outlier had significant confusion between sitting and supine classification. Reviewing the video indicated that this participant spent a long period of time in a seating device that was reclined almost exactly at 45 degrees, making it difficult to determine if the infant was sitting or supine. The infant also spent a long time in the mother's arms in an ambiguous supine/sitting position. This participant's proximal accuracy was also poor because similar ambiguities appeared during the initial recording. In contrast, the "gray diamond" outlier had strong proximal accuracy, with confusion only arising in the distal period between upright and held categories. Reviewing the video showed that all disagreements occurred when the infant was in a baby walker; human coders scored this as "upright" but the models predicted it as "held". Most likely, the infant's movements in the baby walker were more similar to how a baby moved while carried, and unlike how most infants moved while walking upright. 
+
+What is notable about both outliers is that disagreements were restricted to a particular border case (supine vs. sitting; upright vs. held); accuracy for other classes remained strong. This suggests that their poor performance came as a result of spending a long time in an ambiguous position, not the result of the entire model failing to generalize to the later time period (or an error in sensor placement, such as if the parent removed the leggings and put them on backwards after a diaper change). To better capture the typical level of agreement, we report all correlations in Table \@ref(tab:pt2overalltable) excluding the two outliers. Overall agreement among the non-outlier sessions was excellent for both group models (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). 
+
+```{r part2bins, warning=FALSE, fig.cap="Prediction difference (difference in minutes between human-coded and model-predicted body position) for 10-minute bins in the distal comparison period. Each point shows the mean and SE for a single recording session for each body position, summarizing the prediction difference for each of their 10-minute bins. Points falling within the gray shaded region indicate that average prediction errors were less than 1 minute. Performance is plotted separately for (A) group models and (B) individual models. The two outlier participants are plotted in dark gray, with a different shape marking each individual.", fig.align="center", fig.width=8, fig.height=4.5, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+calculate_agreement_bins <- function(ds) {
+  ds <- ds %>% group_by(file) %>% 
+    mutate(sample = row_number(), bin = floor(sample/300)) %>% 
+    add_count(file, bin) %>% ungroup() %>% filter(n > 210) %>% group_by(file) %>% mutate(num_bins = length(unique(bin))) %>% ungroup()
+  model <- ds %>% count(file, bin, num_bins, pos) %>% add_count(file, bin,num_bins,  wt = n, name = "total") %>% mutate(prop_model = n/total)
+  human <- ds %>% count(file, bin, num_bins,  code) %>% add_count(file, bin, num_bins, wt = n, name = "total") %>% mutate(prop_human = n/total)
+  agree <- full_join(select(model, file, pos, prop_model, bin, num_bins), 
+                     select(human, file, code, prop_human, bin, num_bins), 
+                     by = c("file" = "file", "pos" = "code", "bin" = "bin", "num_bins" = "num_bins"))
+  agree <- agree %>% mutate(prop_human = ifelse(is.na(prop_human), 0, prop_human),
+                            prop_model = ifelse(is.na(prop_model), 0, prop_model),
+                            pos - factor(pos, levels = pos_levels))
+  agree <- complete(agree, nesting(file, bin, num_bins), pos, fill = list(prop_human = 0, prop_model = 0))
+}
+
+agree_bins <- map(list("group" = pt2_group, "split" = pt2_split), calculate_agreement_bins)
+
+difference_plot <- function(ds) {
+  ds <- mutate(ds, diff = prop_human - prop_model)
+  ggplot(filter_outliers(ds), aes(x = pos, y = diff, fill = pos, group = file)) +
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = -.1, ymax = .1, fill = "gray", color = "gray") + 
+  #geom_rect(aes(xmin = "Held", xmax = "Upright",ymin = -.1, ymax = .1), fill = "#e5e5e5", color = "#e5e5e5") + 
+  stat_summary(data = filter(ds, file %in% outlier_files), position = position_dodge(.4), aes(shape = file), fill = "#333333", size = .75, stroke = .25) +
+  stat_summary(position = position_dodge(.4), shape = 21, size = .75, stroke = .25) +
+  scale_fill_manual(values = pal, guide = "none") +
+  scale_shape_manual(guide = "none", values = 22:23) + 
+  coord_cartesian(ylim = c(-1, 1)) + xlab("") + 
+  scale_y_continuous(name = "Prediction Difference (min)", breaks = seq(-1, 1, .2), labels = seq(-10, 10, 2), minor_breaks = waiver()) + 
+    theme(axis.text.x = element_text(size = 13, color = "black"))
+}
+#Difference variable is scaled as proportion, but plotted against min/max of 10 minutes
+
+difference_plots <- map(agree_bins, ~ difference_plot(.x))
+difference_plots <- map2(difference_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+difference_plots[[1]] + difference_plots[[2]]
+```
+
+```{r pt2binstable, cache=TRUE, cache.extra=tools::md5sum("data/compiled_agreement_position.csv"), cache.extra=tools::md5sum("data/compiled_agreement_split.csv")}
+#Bins
+pt2corr_with_outliers <- map_dfc(agree_bins, ~ .x %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...3`)
+pt2corr_without_outliers <- map_dfc(agree_bins, ~ .x %>% filter_outliers %>% group_by(pos) %>% cor_test(vars = c("prop_model", "prop_human")) %>% select(pos, cor)) %>% select(-`pos...1`,-`pos...3`)
+pt2corr_bins <- bind_cols(pt2corr_with_outliers, pt2corr_without_outliers)
+rm(pt2corr_with_outliers)
+rm(pt2corr_without_outliers)
+
+group_agree_cor <- cor_test(agree_bins$group, vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor <- cor_test(agree_bins$split, vars = c("prop_model", "prop_human")) %>% pull(cor)
+group_agree_cor_noout <- agree_bins$group %>% filter_outliers %>% 
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+split_agree_cor_noout <- agree_bins$split %>% filter_outliers %>%
+  cor_test(vars = c("prop_model", "prop_human")) %>% pull(cor)
+overall_row <- tibble("Overall", group_agree_cor, split_agree_cor, group_agree_cor_noout, split_agree_cor_noout)
+colnames(overall_row) <- colnames(pt2corr_bins)
+pt2corr_bins <- bind_rows(pt2corr_bins, overall_row)
+rm(overall_row)
+apa_table(pt2corr_bins, col.names = c("Position", "Group", "Individual", "Group", "Individual"), col_spanners = list(`With Outliers` = c(2, 3), `Without Outliers` = c(4, 5)),
+          midrules = 5, caption = "Correlations between human-coded and model-predicted body position durations using 10-minute bins during the distal comparison period. Correlations are provided within each posture and overall, and computed separately using group and individual models with and without outlier participants.")
+```
+
+```{r prediction-difference}
+group_diff <- agree_bins$group %>% 
+  mutate(diff = (prop_human - prop_model)*10,
+         less_than_1 = ifelse(diff >= -1 & diff <= 1, 1, 0))
+group_diff <- group_diff %>% group_by(pos) %>% mutate(n = n()) %>% summarize(prop = sum(less_than_1), total = mean(n)) %>% mutate(prop = apa_num(prop/total*100)) %>% column_to_rownames("pos")
+
+ind_diff <- agree_bins$split %>% 
+  mutate(diff = (prop_human - prop_model)*10,
+         less_than_1 = ifelse(diff >= -1 & diff <= 1, 1, 0))
+ind_diff <- ind_diff %>% group_by(pos) %>% mutate(n = n()) %>% summarize(prop = sum(less_than_1), total = mean(n)) %>% mutate(prop = apa_num(prop/total*100)) %>% column_to_rownames("pos")
+```
+
+### Short-Timescale Agreement during the Distal Comparison
+
+Although overall aggregate agreement in the distal comparison was strong, it is important to show that similarly strong agreement is found within a shorter timescale. We repeated the agreement analysis after dividing the distal comparison period into nine 10-minute bins (marked by vertical dashed lines in Figure \@ref(fig:exemplar-timeline)). Infants had varying numbers of 10-minute bins depending on how much time they were awake and on camera. Bins were included only if there was > 7 minutes of usable data. Table \@ref(tab:pt2binstable) shows the agreement correlation coefficients for group and individual models, including and excluding the two outliers identified in the previous section. Performance at a short timescale was similar to performance overall: Overall agreement after excluding outliers was excellent for both group (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). Within-position correlations were weakest for held and strongest for upright regardless of the model type. Agreement for prone was better for group models, whereas sitting and supine were better predicted by individual models. 
+
+To describe the observed amount of prediction error in 10-minute bins, we subtracted the predicted duration (in minutes) for each body position in each bin from the human coded duration in that bin to create a prediction difference score. A score of 0 would indicate no error; positive differences indicate that the model overestimated the amount of time in a position, whereas negative differences indicate underestimation. Figure \@ref(fig:part2bins) plots the mean prediction difference for each session for each body position. The gray shaded area marks ± 1 minute of prediction error. Most session-averaged predictions fall within 1 minute of error without a clear bias towards overestimation or underestimation. For group models, we calculated the percentage of 10-min bins across participants that had errors < 1 minute: `r group_diff["Held","prop"]`% for held, `r group_diff["Supine","prop"]`% for supine, `r group_diff["Prone","prop"]`% for prone, `r group_diff["Sitting","prop"]`% for sitting, and `r group_diff["Upright","prop"]`% for upright. For individual models, the percent of 10-min bins with < 1 minute of error was: `r ind_diff["Held","prop"]`% for held, `r ind_diff["Supine","prop"]`% for supine, `r ind_diff["Prone","prop"]`% for prone, `r ind_diff["Sitting","prop"]`% for sitting, and `r ind_diff["Upright","prop"]`% for upright.
+
+## Examine the Data Quality of Full-Day Home Recordings
+
+<!-- imu-compiled.csv, generated from analysis-lena-imu/compile_lena_imu.R -->
+
+```{r timelines, warning=FALSE, fig.cap="Full-day timelines for each individual recording session, split by (A) younger infants and (B) older infants. Each participant's timeline shows a stacked bar graph with the proportion of time spent in each of the body positions for every 5-minute period throughout the day, based on group model predictions of body position. The x-axis shows time of day. Caregiver-reported naps are marked by gray bars; blank gaps indicate caregiver-reported times that the sensor garment was removed for diaper changes, baths, or trips out of the house.", fig.align="center", fig.width=7.75, fig.height=8, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+timeline_data <- read_csv("data/imu-compiled.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) %>% 
+  pivot_longer(cols = nap_time:upright_time, names_to = "position", values_to = "prop") %>% 
+  mutate(Position = factor(position,
+                           levels = c("nap_time","upright_time", "sit_time", "prone_time", "supine_time", "held_time"),
+                           labels = c("Nap","Upright", "Sitting", "Prone", "Supine", "Held"))) %>% 
+  arrange(Position, age)
+ 
+
+timelines <- function(ds) {
+  ds$id_uni <- as.numeric(factor(ds$id_uni))
+  ds <- ds %>% mutate(prop = na_if(prop, 0))
+  lims <- as_hms(c('09:00:00', '21:59:00'))
+  hour_breaks = as_hms(c('09:00:00', '10:00:00', '11:00:00', '12:00:00', '13:00:00', '14:00:00', '15:00:00', '16:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00', '21:00:00'))
+  label_breaks = c("9am","","11am","","1pm","","3pm","","5pm","","7pm","","9pm")
+  ggplot(ds, aes(x = clock_time_start, y = prop, fill = Position)) + 
+  geom_bar(stat = "identity") + 
+  facet_wrap("id_uni",ncol = 1, strip.position = "left") + 
+  scale_fill_manual(values = c("Nap" = "gray",pal), name = "") + ylab("") + 
+  scale_x_time(breaks = hour_breaks, labels = label_breaks, name = "", limits = lims) + 
+  theme(legend.position = "bottom",
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 11),
+        strip.text.y.left = element_text(angle = 360))
+  #https://ggplot2tor.com/scales/scale_x_time for options
+  # strip.text.y = element_blank()
+  # strip.background = element_blank(),
+}
+
+timeline_plots <- map(c("Younger", "Older"), ~ timelines(filter(timeline_data, group == .x)))
+timeline_plots <- map2(timeline_plots, c("A. Younger Infants (4-7 mo)", "B. Older Infants (11-14 mo)"), ~ .x + ggtitle(.y))
+timeline_plots[[1]] + timeline_plots[[2]]
+```
+
+```{r start-time}
+start_times <- ppts %>% group_by(id_uni) %>% slice_min(clock_time_start) %>% pull(clock_time_start) %>% sort
+start_times <- str_sub(as.character(start_times), start = 1, end = -4)
+
+end_times <- ppts %>% filter(id_uni != 11104, id_uni != 801) %>%
+  group_by(id_uni) %>% slice_max(clock_time_start) %>% pull(clock_time_start) %>% sort
+end_times <- str_sub(as.character(end_times), start = 1, end = -4)
+
+coverage <- ppts %>% mutate(missing = ifelse(is.na(nap_time), 1, 0)) %>%
+  filter(id_uni != 11104, id_uni != 801) %>% 
+  group_by(id_uni) %>% 
+  summarize(blocks = n(), missing = sum(missing, na.rm = T), naps = sum(nap_time, na.rm = T)) %>% 
+  mutate(total = blocks * 5/60, 
+         prop_accounted = 1-(missing/(blocks-missing)), 
+         hours_recorded = (blocks-missing-naps)*5/60,
+         naptime = naps * 5/60)
+```
+
+After the distal comparison video ended, caregivers were instructed to keep the sensors on their infants for the remainder of the day until infants went to bed, removing the sensors for naps, diaper changes, and trips out of the house. The algorithm was not designed to classify behavior during transportation (e.g., strollers, automobiles) so data collection was restricted to in-home behavior. The first two sets of results show that accuracy was consistently high across the proximal and distal recordings, providing confidence that predictions over the remainder of the day would continue to be accurate after the video recordings stopped. This leads to two final questions---how successfully did recordings capture infants' entire day, and how well do findings from full-day classification converge with findings that use other methodologies? 
+
+### How Well Did Recordings Capture Infants' Entire Day?
+
+Figure \@ref(fig:timelines) depicts body position timelines across the day for each session, divided into younger (A) and older infants (B). Predictions from the group model were used to ensure that motion data were classified consistently across all sessions. Moreover, for infants who did not display all 5 body positions in the training period, group models were necessary to predict those behaviors across the entire day. Session start times ranged from `r start_times[1]` to `r start_times[length(start_times)]` with a median of `r start_times[floor(length(start_times)/2)]`. Sometimes infants were unexpectedly asleep at the scheduled time, leading to a few sessions in which infants began wearing the sensors later than intended (such as \#11 in the younger group). With two exceptions, recordings lasted until the infants' bedtime. Older participant \#1 had the equipment picked up on the same day rather than the next day, so the recording ended at 17:00. Older participant \#11 wore the equipment in the morning, but the family left the house at 10:15 and remained out for the rest of the day, choosing not to put the equipment back on when they returned home in the late afternoon. Among those participants who wore the equipment until bedtime, recordings ended between `r end_times[1]` and `r end_times[length(end_times)]` with a median of `r end_times[floor(length(end_times)/2)]`. 
+
+Among participants who wore the sensors from morning to bedtime, all infants wore the sensor garment during 100% of the intended recording period, excluding the times caregivers were asked to remove the garment (naps, diaper changes, trips out of the house), based on caregiver logs of wear time. No caregiver reporting removing the garment for any other reason (such as infant discomfort), meaning that the majority of the time during the day either resulted in usable body position data or was excluded due to caregiver-reported naps (gray periods in Figure \@ref(fig:timelines)). The total length of the recording period ranged from `r apa_num(min(coverage$total))`-`r apa_num(max(coverage$total))` hours with a median of `r apa_num(median(coverage$total))` hours. Nap times reported during the recording period ranged from `r apa_num(min(coverage$naptime))`-`r apa_num(max(coverage$naptime))` hours with a median of `r apa_num(median(coverage$naptime))` hours. Body position data were available to describe `r apa_num(min(coverage$prop_accounted)*100, digits = 1)`-`r apa_num(max(coverage$prop_accounted)*100, digits = 1)`% of the awake portion of the recording period (median = `r apa_num(median(coverage$prop_accounted)*100, digits = 1)`%). Younger infant \#14 had the least portion of the waking day accounted for; the family left the house to run errands during the majority of the recording period, and the infant napped during much of the remaining time at home. Overall, the recordings produced a median of `r apa_num(median(coverage$hours_recorded))` hours of motion data, with the entire dataset totaling `r apa_num(sum(coverage$hours_recorded))` hours. Even the shortest full recording (`r apa_num(min(coverage$hours_recorded))` hours) exceeded the longest observational sessions in past work in which an experimenter operated a camera. 
+
+Considering that body position annotation takes 2-5 hours of labor per 1 hour of behavior, the `r round(sum(coverage$hours_recorded))` hours of data we recorded would have taken `r round(sum(coverage$hours_recorded)*2)`-`r round(sum(coverage$hours_recorded)*5)` hours of labor to annotate from video. However, only an estimated `r round(nrow(coverage)*2)`-`r round(nrow(coverage)*5)` hours of labor was needed to annotate the initial hour of each session's video that was used to train the machine learning models---an immense savings in the human labor cost of annotation that allows the method to scale to larger sample sizes and recording durations.
+
+
+```{r age, warning=FALSE, fig.cap="Age differences in daily body position predicted from (A) group models and (B) individual models. Each circle represents one full-day recording session's proportion of time in each body position (y-axis) against age in months (x-axis). Black lines indicate best fit regression lines indicating decreases in supine time and increases in sitting and upright time with age.", fig.align="center", fig.width=7.5, fig.height=7, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+fullday_group <- read_csv("data/imu-compiled.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) 
+
+fullday_split <- read_csv("data/imu-compiled-split.csv") %>% 
+  mutate(id_uni = factor(id*100+session),
+         group = factor(ifelse(age <= 8, "Younger", "Older")),
+         nap_time = ifelse(is.na(sit_time), nap_time, NA)) 
+
+fullday <- list("group" = fullday_group, "split" = fullday_split)
+
+fullday_long <- function(ds) {
+  ds %>% pivot_longer(cols = sit_time:upright_time, names_to = "position", values_to = "prop") %>% 
+  mutate(position = factor(position, levels = c("supine_time", "prone_time", "sit_time", "upright_time", "held_time"), labels = c("Supine", "Prone", "Sitting", "Upright", "Held"))) %>% 
+  arrange(position, age)
+}
+
+age_scatter <- function(ds) {
+  ds %>% drop_na(prop) %>% 
+  ggplot() + facet_wrap("position", as.table = T, ncol = 2) + 
+  geom_smooth(aes(x = age, y = prop), color = "#191919", method = "lm", se = T) + 
+  stat_summary(fun = "mean", mapping = aes(x = age, y = prop, group = id_uni, fill = position), shape = 21, size = .7) + 
+  scale_fill_manual(values = pal, guide = "none") + 
+  scale_x_continuous(name = "Age (months)", breaks = seq(3, 15, 3), limits = c(3,15)) + 
+  ylim(0,1) + ylab("Proportion of waking day") + 
+  theme(panel.spacing.x = unit(.5, "lines")) +
+  theme(panel.spacing.y = unit(1, "lines")) + 
+  theme(strip.background = element_blank(), strip.text.x = element_text(size = 16, face = "bold"))
+}
+
+age_plots <- map(fullday, fullday_long) %>% map(age_scatter)
+age_plots <- map2(age_plots, c("A. Group Models", "B. Individual Models"), ~ .x + ggtitle(.y))
+age_plots[[1]] + age_plots[[2]]
+
+```
+
+```{r agetable, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+pos_sum_age <- map(fullday, fullday_long) %>% 
+  map(~ group_by(.x, group, position, id_uni) %>% 
+            mutate(prop = prop * 100) %>% 
+            get_summary_stats(prop) %>% 
+            group_by(group, position) %>% 
+            get_summary_stats(mean) %>% 
+            select(group, position, mean, sd))
+
+pos_sum_lookup <- pos_sum_age %>% 
+  map2_dfr(c("Group", "Individual"), 
+                         ~ mutate(.x, Model = .y) %>%
+                           select(-sd) %>% 
+                           pivot_wider(names_from = group, values_from = mean)) %>% 
+  pivot_wider(names_from = Model, values_from = c("Younger", "Older")) %>% 
+  column_to_rownames("position")
+
+pos_sum_age <- pos_sum_age %>% map2_dfr(c("Group", "Individual"), 
+                         ~ mutate(.x, Model = .y,
+                                  mean_sd = str_glue("{apa_num(mean, digits = 1)}% ({apa_num(sd, digits = 1)})")) %>% 
+                           select(-mean, -sd) %>% 
+                           pivot_wider(names_from = group, values_from = mean_sd)) %>% 
+  pivot_wider(names_from = Model, values_from = c("Younger", "Older")) %>% 
+  relocate(Younger_Individual, .after = Older_Group)
+
+apa_table(pos_sum_age, col.names = c("Position", "Younger", "Older", "Younger", "Older"), col_spanners = list("Group" = c(2, 3), "Individual" = c(4, 5)),
+          caption = "Summary of age differences in full-day body position for younger (4- to 7-month) and older (11- to 14-month) infants. Values shown are the mean percent of time for each body position averaged across infants in each group. Standard deviations are shown in parentheses. Descriptive statistics are shown separately for group and individual models.")
+
+```
+
+```{r pos-correlations, cache=TRUE, cache.extra=tools::md5sum("data/imu-compiled.csv")}
+pos_sum_ppt <- map(fullday, 
+                   ~ group_by(.x, age, id_uni) %>% 
+                     filter(is.na(nap_time)) %>% 
+                     summarize(across(sit_time:upright_time, \(x) mean(x, na.rm = TRUE))) %>% 
+                     ungroup %>% select(-id_uni))
+
+age_cor_group <- cor_mat(pos_sum_ppt$group)
+age_cor_group_pval <- age_cor_group %>% cor_get_pval() %>% column_to_rownames("rowname")
+age_cor_group <- age_cor_group %>% column_to_rownames("rowname")
+age_cor_ind <- cor_mat(pos_sum_ppt$split)
+age_cor_ind_pval <- age_cor_ind %>% cor_get_pval() %>% column_to_rownames("rowname")
+age_cor_ind <- age_cor_ind %>% column_to_rownames("rowname")
+```
+
+### Can Full-Day Estimates of Body Position Reveal Age Differences?
+
+In order to show the convergent validity of the classification method, we demonstrate how the full-day recordings can reveal individual differences in body position according to age, replicating age differences revealed in past work [@Survey]. Table \@ref(tab:agetable) summarizes the percent of time that younger and older infants spent in each body position out of their awake samples, as predicted by group and individual models. EMA surveys [@Survey] found that from 3-12 months, infants spent less time held, reclined, and supine but spent increasingly more time sitting and upright. The most straightforward comparisons between the two investigations are upright and prone, because they were defined identically. In @Survey, upright time was 0.6-5.5% of the time for infants 3-6 months, increasing to 22.0% at 12 months. Results from the current study were similar: younger infants' upright time estimated from full-day group models was `r pos_sum_lookup["Upright", "Younger_Group"]`% compared with `r pos_sum_lookup["Upright", "Older_Group"]`% for the older group. In @Survey, prone time was 2.9-9.2% of the time for infants 3-6 months, and was 7.2% at 12 months. In the current study, prone time was `r pos_sum_lookup["Prone", "Younger_Group"]`% for younger infants and `r pos_sum_lookup["Prone", "Older_Group"]`% for older infants. Furthermore, our results are similar in showing that held and supine time was less for older infants than younger infants (Table \@ref(tab:agetable)). Sitting was greater for older infants (`r pos_sum_lookup["Sitting", "Older_Group"]`%) compared with younger infants (`r pos_sum_lookup["Sitting", "Younger_Group"]`%). Moreover, sitting was the most frequent body position followed by upright in 12-month-olds [@Survey], just as we observed in the current study. 
+
+Figure \@ref(fig:age) shows that both group and individual model predictions captured age-related differences in body position. Age in months and upright time were significantly, positively correlated using group (*r* = `r age_cor_group["age","upright_time"]`, *p* `r apa_p(age_cor_group_pval["age","upright_time"], add_equals = T)`) and individual models (*r* = `r age_cor_ind["age","upright_time"]`, *p* `r apa_p(age_cor_ind_pval["age","upright_time"], add_equals = T)`). Similarly, age predicted increases in sitting time using group (*r* = `r age_cor_group["age","sit_time"]`, *p* `r apa_p(age_cor_group_pval["age","sit_time"], add_equals = T)`) and individual models (*r* = `r age_cor_ind["age","sit_time"]`, *p* `r apa_p(age_cor_ind_pval["age","sit_time"], add_equals = T)`). In contrast, age predicted decreases in supine time using group (*r* = `r age_cor_group["age","supine_time"]`, *p* `r apa_p(age_cor_group_pval["age","supine_time"], add_equals = T)`) and individual models (*r* = `r age_cor_ind["age","supine_time"]`, *p* `r apa_p(age_cor_ind_pval["age","supine_time"], add_equals = T)`). No clear age trends were found for prone time. Age was not significantly related to held time for group models (*r* = `r age_cor_group["age","held_time"]`, *p* `r apa_p(age_cor_group_pval["age","held_time"], add_equals = T)`), but individual models showed a significant negative correlation (*r* = `r age_cor_ind["age","held_time"]`, *p* `r apa_p(age_cor_ind_pval["age","held_time"], add_equals = T)`) resulting from an outlier in the younger group. 
+
+# Discussion
+
+Here, we demonstrated the validity of long-form recordings of infant body position using wearable inertial sensors. Models trained during the proximal comparison period performed well on testing data collected from the same recording period. Most important, accuracy was consistently strong later in the recording when behavior was completely unsupervised: Human-coded and model-predicted durations of body positions during the distal comparison period were highly correlated, even when narrowing to the scale of 10 minutes. Examining full recordings showed that the new method allows us to capture more data (median = `r apa_num(median(coverage$hours_recorded))` hours of awake behavior) than is typical with video methods (1-2 hours) while simultaneously reducing the human labor needed to annotate it. Ultimately, age differences in body position mirrored past findings that employed other methods, suggesting that the outcome of full-day body position recordings is suitable for describing developmental changes in motor behavior.
+
+## Accurate Results in Challenging Circumstances
+
+How did classification in the current investigation compare to prior work [@FranchakScott2021; @AiraksinenRasanen2020; @AiraksinenGallen2022]? Across body positions, median accuracy was `r metrics_lookup["Overall Accuracy", "median_Group"]*100`% for group models (Kappa = `r metrics_lookup["Kappa", "median_Group"]`) and `r metrics_lookup["Overall Accuracy", "median_Individual"]*100`% for individual models (Kappa = `r metrics_lookup["Kappa", "median_Individual"]`) during the proximal comparison. Although these accuracy and kappa values are slightly lower than in past work (accuracy 95-98%, kappas .93-.95), we note that those past values were obtained under ideal circumstances. A researcher applied the sensors in the lab [@FranchakScott2021; @AiraksinenRasanen2020] or home [@AiraksinenGallen2022] and set the stage for how infants and caregivers should interact. For example, both @FranchakScott2021 and @AiraksinenGallen2022 instructed the caregivers that the recorded sessions should mimic "playtime", which would encourage more common activities that would be easier to classify (e.g., crawling and sitting on the floor) and discourage idiosyncratic and potentially more challenging activities (e.g., positioning in infant-specific furniture like exersaucers and walkers, sitting or lying for long periods while eating or nursing). Examining the timelines in Figure \@ref(fig:timelines) shows how much variability there is between and within sessions in the earlier parts of the recording that were used for training and testing. 
+
+The challenge increased in the distal comparison period. Since sessions were scheduled at convenient times for the infant and caregiver, the transition from the proximal to distal period increased the odds that infants might need a nap, a snack/meal, or engage in a less typical activity (e.g., watching TV). Indeed, the distal comparison in Figure \@ref(fig:exemplar-timeline) contains a long period (almost 50 minutes) where the infant sat in a high chair eating lunch. Regardless of these challenges, accuracy in the distal comparison continued to be strong. Barring two outliers (which we will discuss further), agreement was high for group (*r* = `r group_agree_cor_noout`) and individual models (*r* = `r split_agree_cor_noout`). Even at a finer timescale, most errors within 10-minute bins were less than 1 minute in total for all five body positions. For comparison, the reliability of human coders on the body position code was ~90%, putting model-predicted accuracy on a similar level to human coders. 
+
+Idiosyncrasies in activities and device use make it challenging to decide *a priori* whether "odd" classifications (from the expectation of the researcher) are possible. For example, younger infant \#8 on Figure \@ref(fig:timelines) spent an unusual amount of time upright at an age where infants cannot yet stand. Inspecting the video revealed that the infant spent long periods of time suspended in a jumper that supported their body in an upright position. Although it is not feasible to collect large amounts of video data to check model predictions, interviewing caregivers about common activities and devices may provide a way to understand unexpected predictions. Counterintuitively, the two outlier participants increased our confidence that the body position classification method works as intended. At first glance, seeing low agreement rates for two sessions would suggest that the models perform poorly at predicting some *infants'* behavior. Instead, we found that for those infants, errors were restricted to two positions during a single, long-lasting event, while the other three body positions continued to be classified correctly. In other words, the models failed to predict a particular *event* for each of the two infants. 
+
+## Benefits and Drawbacks of Different Modeling Approaches
+
+Throughout the paper, we compared results from two modeling approaches: group models that included all participants' data in the training set versus individual models that used only one participant's data. When considering different metrics, testing periods, body positions, as well as the logistical benefits of each, there is no clear winner. Below, we discuss the pros and cons to each approach so that researchers might decide what works best for their intended application.
+
+Overall accuracy and kappa values were better in individual models compared with group models when collapsed across body positions in the proximal period. However, within-class performance did not always favor individual models---prone predictions were better for group models, and held predictions were almost identical. In the distal comparison (after removing outliers), overall correlations were nearly identical. Within classes, group models had an advantage for prone, upright, and held, whereas individual models had an advantage for sitting and supine. Possibly, individual models are better suited for capturing unique aspects of the devices used for sitting and reclining that lead to better performance in those classes. Finally, age effects (either by group or by age correlation) were nearly identical across the two methods, suggesting that either method would lead to the correct conclusion regarding developmental changes in body position. Outliers were present in both models' predictions: group models produced three sessions with the worst overall accuracy, but individual models produced the single worst kappa. The outliers for the distal comparison period appeared in both models' predictions. For aggregated full-day body position, the most blatant outlier (a young infant held > 60% of the day) resulted from an individual model. The choice of model might depend on which behavior is most important to capture for a given research question.
+
+Aside from differences in validity, researchers may favor one modeling approach based on logistical concerns. Group models have several major advantages. First, by definition they are trained on more data, which might make predictions more consistent. Second, group models remove the need to get optimal training data from each participant. It can be difficult to elicit every behavior of interest in each infant; individual models require that every behavior that will be later predicted was displayed by each individual infant. In fact, group models remove the need to get *any* training data for a particular infant. Finally, applying a group model means that individual differences between infants are due to their behavior being classified in a consistent way, rather than having a separate set of rules for predicting each individual. However, given the variety in infant behavior, individual models are more agile in capturing the unique and unexpected. Likewise, individual models can be an excellent choice for rapid prototyping and pilot testing. A researcher can get proof-of-concept data from a single participant or a new kind of classification scheme (i.e., locomotion, restraint in device) without annotating an entire sample. Individual models may also be applied in clinical cases where infants vary widely in their motor abilities and/or use of assistive devices.
+
+As in past work [@AiraksinenRasanen2020], performance was best when using all four sensors and degraded when using any subset of two (i.e., thighs only, left leg only). Small decrements and accuracy were seen for some pairs (particularly when using the left ankle and thigh), but decrements for other pairs (both ankles) or individual sensors were substantial. Using a thigh and ankle pair instead of four sensors would be more cost effective without a large decrease in accuracy, but in some applications the increased accuracy might be worth the cost. Beyond group and individual models and sensor pairings, there were many degrees of freedom in our choice of how best to model body position. For the sake of brevity, we chose to report the best approach, not every possible variation in modeling. However, our openly shared data and code allow researcher to experiment with different sets of motion features, different sets of training data, different machine learning algorithms, and different hyperparameter values. We tested but did not report models that used either only accelerometer data and only gyroscope data; in both cases, performance was degraded compared with models that use both types of motion. We also tried different machine learning algorithms (XGBoost, Tabnet), but found that random forest models performed the best. Finally, we tried modeling each age group separately, but found no benefit to performance by tailoring to the particular age group.
+
+## Novel Research Possibilities
+
+Long-form recordings of motor behavior bring about new research possibilities. Although past work using video [@Karasik2011; @ChenSchneider2022; @HerzbergFletcher2021] produced real-time data, such data were limited to a relatively small part of the infants' day. And although survey methods [@Survey] could capture moments scattered throughout the day, they do not produce real-time data. The combination of real-time, full-day data about infant motor behavior is unprecedented and offers new opportunities for understanding infants' everyday experiences. Collecting dense data over the entire variety of daily experiences helps to more accurately measure infants' experiences in aggregate (as in Figure \@ref(fig:age)) without biasing results from a particular type of activity (e.g., play). Long-form recordings also have the potential to measure clinically-relevant outcomes for infants with motor delay or other pediatric concerns.
+
+In the past decade, developmental scientists have discovered that distributional information about infants' experiences matter for how infants learn [@ClerkinHart2017; @KachergisYu2017; @RazAbney2019]. Skewed distributions---those that favor the repetition of a small subset of experiences---facilitate learning. For example, recordings from wearable head cameras in the home indicate that infants see a small subset of objects with high frequency [@ClerkinHart2017], but most objects are seen infrequently. Heterogeneity is also found in how experiences are distributed in time---burstiness and clustering are seen in infants' daily experiences seeing objects and hearing music [@MendozaFausey2022; @CasillasElliott2021]. Long-form motor recordings provide a novel opportunity to measure the temporal structure in the sequences of body positions seen in Figure \@ref(fig:timelines). How skewed are infants' experiences with different motor behaviors, and how are they clustered in time? Linking the distributional structure of a particular motor experience in a real day, such as time spent sitting, might be predicted by sitting skill and/or might predict infants' future sitting ability. Moreover, real-time recording of motor behavior provides a way to measure how infant motor behavior links to other types of experiences in the moment in daily life.@MalachowskiSalo2023 used a combination of LENA&reg; and EMA surveys to find that infants heard less adult speech when restrained in seating devices. Combining LENA&reg; and long-form motor recordings can take this a step further by measuring more precisely how speech and body position co-vary within a day. 
+
+What underpins these novel research applications is that body position classifications can be applied automatically at scale. Annotating a video corpus of infant behavior from a moderately sized sample---such as 40 infants recorded for 2 hours each in 2 separate visits [@HerzbergFletcher2021]---is incredibly labor intensive. Annotating a larger, more representative sample of *hundreds of infants* while simultaneously scoring *full-day data* would be prohibitive. With sufficiently accurate group models, researchers could annotate a moderately-sized video corpus to then apply the model to hundreds of full-day recordings. Unlike with video, the added cost of more IMU sensor recording time is low, meaning that future studies could sample across multiple days of behavior to better understand intra- versus inter-day variability. Prior diary methods show that infants inconsistently display new motor skills on a day-to-day basis [@AdolphRobinson2008; @AdolphRobinson2011]. Multi-day recordings could further uncover how infants' experiences vary over timescales from seconds to days. 
+
+## Limitations
+
+We acknowledge several limitations in the current approach. First, a stronger test of full-day accuracy would be to compare accuracy at the start of the recording period to accuracy at the end, rather than using the distal comparison video that followed the first 90 minutes of the study. As we described in the procedure section, synchronizing video cameras and inertial sensors required capturing a synchronization point on video. We completed this procedure prior to giving equipment to caregivers so that they were not responsible for synchronization; in fact, caregivers never (purposefully) touched a button on the video camera. An end-of-day video would require a lot of effort and compliance on the part of caregivers, and any mistakes in the procedure would lead to misaligned and unusable data. Given that most recordings ended at infants' bedtimes, having an experimenter visit families in the evening to video record would be intrusive.
+
+Second, we relied on caregiver logs of infants' naps and times when sensors were removed to separate usable data (times when infants wore the sensors while awake) from unusable data. Future work should aim to further assess caregivers' perceptions about the usability and comfort of the garment. Although infants wore the sensor garment throughout all of the desired times, we did not collect independent data (aside from caregivers' logs) to verify wear time. Most caregivers were diligent about completing logs, however, there were a few cases that caregivers may have failed to report naps (younger infants \#1 and \#4). In the future, algorithms can be developed to automatically identify periods of sleep and times when sensors are off the body. Such algorithms exist for adults using wrist-worn sensors, however, we did not use them because they have not been validated for infant participants wearing sensors on thighs/ankles. Differences in infants' positioning while asleep (held in caregivers arms, laying in cribs, reclined in strollers and carseats) might make classifying sleep more difficult compared with adults based on movement. 
+
+Third, although the goal was to collect fully naturalistic behavior, our recording protocol led to some changes that might have affected (or missed) some behaviors. We opted to restrict recording to times when participants were in the home. Inertial sensors can travel with participants, and there is no doubt that infants could have worn the sensors out of the home on errands. However, we do not yet have training data to detect periods of transportation (e.g., moving in a car or in a stroller) that might add noise and/or lead to misclassification of body positions. It is also unknown whether participants might have behaved differently had they not worn the sensors. The added bulk in the garment from the sensors (including the LENA&reg; recorder) might have made some positions more uncomfortable, such as lying prone with the LENA&reg; recorder worn on the chest, and/or influenced how caregivers chose to position infants throughout the day.
+
+## Conclusions
+
+In summary, the current study demonstrates the validity of long-form recordings of infant motor behavior in the home. Our analyses show that body position classifications---whether infants are supine, prone, sitting, upright, or held---are accurate immediately and even following a substantial delay. Most important, we find substantial agreement between human-coded and model-predicted body position for data collected during truly everyday, unsupervised activities that create the most challenging cases for automatic classification. In most cases, model prediction accuracy approached human reliability, suggesting that model predictions can be confidently used in analyses of full-day infant behavior. Examining the resulting corpus of > 200 hours of real-time infant body position showed the feasibility of capturing data covering the majority of infants' awake time and the variety of activities contained therein. A rudimentary analysis of aggregated data showed that full-day position estimates conformed to expectations about age differences in motor behavior. Future work employing the method can go beyond aggregated measures of behavior to uncover the temporal structure in infants' daily motor experiences. 
+
+```{r results="hide"}
+writeLines(capture.output(devtools::session_info()), "session_info.txt")
+```
+
+\newpage
+
+# Declarations
+
+## Funding 
+
+This work was funded by National Science Foundation Grant BCS #1941449.
+
+## Competing Interests 
+
+The authors have no competing interests to declare that are relevant to the content of this article.
+
+## Ethics Approval
+
+The study was performed in accordance with the ethical standards as laid down in the 1964 Declaration of Helsinki. The study procedures were approved by the Institutional Review Board of the University of California, Riverside, Protocol HS-15-050. 
+
+## Consent
+
+Consent to participate: All caregivers provided written informed consent prior to the start of the study. 
+Consent to publish: Additional written consent was obtained by caregivers for data sharing of audio and video data.
+
+## Data, Material and Code availability 
+
+A Databrary repository (https://nyu.databrary.org/volume/1580) includes an exemplar participant's recording session, with the raw video data files, the Datavyu annotations of those video files, a log file with machine-readable synchronization points and nap/diaper change times, and accelerometer and gyroscope data for each of the 4 sensors. A GitHub repository (https://github.com/JohnFranchak/body_position_classification_example) contains the exemplar participant's data and source code to: 1) synchronize IMU and video annotations, 2) calculate windowed motion features for their data, and 3) train and test the body position classifier using an "individual model". Because of the overall size of the full dataset and the computational power/time required to synchronize and create windowed datasets for each session, it would not be feasible to reproduce the calculations for all 34 sessions. However, in a second Github repository (https://github.com/JohnFranchak/body_position_classification_ms) we share the full results of those computations: The dataset of windowed motion features with corresponding body position codes used to validate the method.
+
+
+\newpage
+
+<!-- # References -->
+
+::: {#refs custom-style="Bibliography"}
+:::
